@@ -1,0 +1,27 @@
+digraph G {
+  graph [layout="sfdp", overlap="prism", splines="true", outputorder="edgesfirst", bgcolor="white", pad="0.25", labelloc="t", labeljust="l"];
+  label="sif4 pooling after reduced";
+  node [shape="circle", fixedsize="true", width="0.30", height="0.30", label="", style="filled", penwidth="0.6", color="#263238", fontname="Helvetica", fontsize="7"];
+  edge [arrowsize="0.35", penwidth="0.55", color="#77777788"];
+  c_0 [fillcolor="#F28E2B", label="N1", tooltip="t_HN_SIF(S); t_HN_NH2(S); t_F3SI_NH2(S); t_F2SINH(S); t_H2NFSINH(S); t_HN(FSINH)2(S)"];
+  c_1 [fillcolor="#F28E2B", label="N2", tooltip="s_HN_SIF(S); s_HN_NH2(S); s_F3SI_NH2(S); s_F2SINH(S); s_H2NFSINH(S); s_HN(FSINH)2(S)"];
+  c_2 [fillcolor="#F28E2B", label="N3", tooltip="k_HN_SIF(S); k_HN_NH2(S); k_F3SI_NH2(S); k_F2SINH(S); k_H2NFSINH(S); k_HN(FSINH)2(S)"];
+  c_3 [fillcolor="#4E79A7", label="N4", tooltip="H2; H; NH; NH2; NNH; N2H2; N2H3; N2H4; SIHF3; OH; H2O; HO2; CH; CH2; CH2(S); CH3; CH4; HCO; CH2O; CH2OH; CH3O; CH3OH; C2H; C2H2; C2H3; C2H4; HCCO; CH2CO; HCCOH; HNO; HCN; H2CN; HCNN; HCNO; HOCN; HNCO"];
+  c_5 [fillcolor="#4E79A7", label="N5", tooltip="F; SIF4; SIF3"];
+  c_6 [fillcolor="#4E79A7", label="N6", tooltip="O; O2; CO; CO2"];
+  c_9 [fillcolor="#59A14F", label="N7", tooltip="SI(D)"];
+  c_10 [fillcolor="#59A14F", label="N8", tooltip="N(D)"];
+  c_12 [fillcolor="#4E79A7", label="N9", tooltip="NH3"];
+  c_14 [fillcolor="#4E79A7", label="N10", tooltip="HF"];
+  c_1 -> c_14 [color="#59A14F88"];
+  c_2 -> c_14 [color="#59A14F88"];
+  c_0 -> c_14 [color="#59A14F88"];
+  c_12 -> c_3 [color="#4E79A788"];
+  c_12 -> c_14 [color="#4E79A788"];
+  c_12 -> c_0 [color="#59A14F88"];
+  c_12 -> c_1 [color="#59A14F88"];
+  c_5 -> c_14 [color="#4E79A788"];
+  c_6 -> c_3 [color="#4E79A788"];
+  c_2 -> c_10 [color="#59A14F88"];
+  c_2 -> c_9 [color="#59A14F88"];
+}

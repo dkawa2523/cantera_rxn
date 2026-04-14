@@ -1,0 +1,26 @@
+digraph G {
+  graph [layout="sfdp", overlap="prism", splines="true", outputorder="edgesfirst", bgcolor="white", pad="0.25", labelloc="t", labeljust="l"];
+  label="ac pooling after reduced";
+  node [shape="circle", fixedsize="true", width="0.30", height="0.30", label="", style="filled", penwidth="0.6", color="#263238", fontname="Helvetica", fontsize="7"];
+  edge [arrowsize="0.35", penwidth="0.55", color="#77777788"];
+  c_0 [fillcolor="#F28E2B", label="N1", tooltip="X_T(s); H_T(s); CH3_T(s); CH2_T(s); CH_T(s); C_T(s); C2H4_T(s); C2H2_T(s); C2H_T(s); C2_T(s); X_S(s); H_S(s); CH3_S(s); CH2_S(s); CH_S(s); C_S(s); C2H4_S(s); C2H2_S(s); C2H_S(s); C2_S(s); X_K(s); H_K(s); CH3_K(s); CH2_K(s); CH_K(s); C_K(s); C2H4_K(s); C2H2_K(s); C2H_K(s); C2_K(s); X_D(s); H_D(s); CH3_D(s); CH2_D(s); CH_D(s); C_D(s); C2H4_D(s); C2H2_D(s); C2H_D(s)"];
+  c_1 [fillcolor="#4E79A7", label="N2", tooltip="H2; H; OH; H2O; HO2; H2O2; CH; CH2; CH2(S); CH3; CH4; HCO; CH2O; CH2OH; CH3O; CH3OH; C2H; C2H2; C2H3; C2H4; C2H5; C2H6; HCCO; CH2CO; HCCOH; NH; NH2; NH3; NNH; HNO; HCN; H2CN; HCNN; HCNO; HOCN; HNCO; C3H7; C3H8; CH2CHO; CH3CHO"];
+  c_2 [fillcolor="#4E79A7", label="N3", tooltip="O; O2; CO; CO2; NO; NO2; N2O; NCO"];
+  c_3 [fillcolor="#4E79A7", label="N4", tooltip="C; CN"];
+  c_4 [fillcolor="#4E79A7", label="N5", tooltip="N; N2"];
+  c_6 [fillcolor="#59A14F", label="N6", tooltip="C_bulk"];
+  c_7 [fillcolor="#F28E2B", label="N7", tooltip="C2_D(s)"];
+  c_0 -> c_1 [color="#59A14F88"];
+  c_1 -> c_0 [color="#59A14F88"];
+  c_7 -> c_6 [color="#59A14F88"];
+  c_6 -> c_7 [color="#59A14F88"];
+  c_2 -> c_3 [color="#4E79A788"];
+  c_3 -> c_2 [color="#4E79A788"];
+  c_3 -> c_6 [color="#59A14F88"];
+  c_6 -> c_3 [color="#59A14F88"];
+  c_3 -> c_4 [color="#4E79A788"];
+  c_4 -> c_3 [color="#4E79A788"];
+  c_7 -> c_0 [color="#F28E2B88"];
+  c_1 -> c_3 [color="#4E79A788"];
+  c_0 -> c_6 [color="#59A14F88"];
+}

@@ -1,0 +1,864 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>Cantera Mechanism Reduction Benchmark Report</title>
+<style>
+@page { size: A4; margin: 13mm 11mm; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans JP", "Yu Gothic", Meiryo, sans-serif; line-height: 1.55; color: #202124; font-size: 10.5pt; }
+h1 { font-size: 22pt; border-bottom: 2px solid #333; padding-bottom: 0.25em; margin-top: 0; }
+h2 { font-size: 16pt; border-bottom: 1px solid #aaa; padding-bottom: 0.15em; margin-top: 1.5em; break-after: avoid; }
+h3 { font-size: 13pt; margin-top: 1.25em; break-after: avoid; }
+p, li { overflow-wrap: anywhere; }
+table { border-collapse: collapse; width: 100%; margin: 0.7em 0 1.1em; font-size: 8.5pt; page-break-inside: avoid; }
+th, td { border: 1px solid #c8c8c8; padding: 4px 5px; vertical-align: top; }
+th { background: #f1f3f4; }
+img { max-width: 100%; height: auto; }
+table img { max-width: 31vw; }
+pre { background: #f6f8fa; border: 1px solid #d0d7de; padding: 8px; overflow-wrap: anywhere; white-space: pre-wrap; font-size: 8.5pt; }
+code { font-family: Consolas, "Courier New", monospace; font-size: 0.92em; }
+a { color: #0b57d0; text-decoration: none; }
+.math, .arithmatex { font-family: Cambria Math, STIXGeneral, serif; }
+</style>
+</head>
+<body>
+<h1 id="cantera-mechanism-reduction-benchmark-report">Cantera Mechanism Reduction Benchmark Report</h1>
+<p>対象: <code>eval53viz</code> large 3-benchmark set<br>
+対象手法: <code>baseline</code>, <code>learnckpp</code>, <code>pooling</code></p>
+<h2 id="1">1. 問題設定</h2>
+<p>本レポートは、Cantera で扱う表面反応を含む大規模反応機構を、物理制約を守りながら小さい反応ネットワークへ縮退できるかを評価する。</p>
+<p>ベンチマークは次の3ケースである。</p>
+<table>
+<thead>
+<tr>
+<th>benchmark</th>
+<th>対象</th>
+<th style="text-align: right;">縮退前 species</th>
+<th style="text-align: right;">縮退前 reactions</th>
+<th style="text-align: right;">条件数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>diamond</code></td>
+<td>diamond CVD large</td>
+<td style="text-align: right;">78</td>
+<td style="text-align: right;">385</td>
+<td style="text-align: right;">4</td>
+</tr>
+<tr>
+<td><code>sif4</code></td>
+<td>SiF4 / NH3 / Si3N4 CVD large</td>
+<td style="text-align: right;">82</td>
+<td style="text-align: right;">365</td>
+<td style="text-align: right;">6</td>
+</tr>
+<tr>
+<td><code>ac</code></td>
+<td>acetylene hydrocarbon CVD large</td>
+<td style="text-align: right;">94</td>
+<td style="text-align: right;">425</td>
+<td style="text-align: right;">8</td>
+</tr>
+</tbody>
+</table>
+<p>各 benchmark に対し、3つの縮退手法を適用した。結果は、縮退前後のネットワーク図と、温度・圧力・密度などのマクロ物性比較図で確認する。</p>
+<p>ネットワーク図の読み方:</p>
+<ul>
+<li>ノード: 状態または species。マージされた場合は代表ノードとして描画する。</li>
+<li>エッジ: 反応により結ばれる状態間の関係。</li>
+<li>ノード色: 青 = gas、橙 = surface、緑 = bulk または mixed/other。</li>
+<li>ノードサイズ: 全ノード固定。密度と接続数を見やすくするため。</li>
+<li>ノード番号と反応式: 各 <code>*_node_map.md</code> に記載。</li>
+</ul>
+<p>ノード色の凡例:</p>
+<table>
+<thead>
+<tr>
+<th>色</th>
+<th>意味</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span style="color:#4E79A7;font-size:1.3em;">●</span> 青</td>
+<td>gas</td>
+<td>気相 species または気相 species を代表する縮退ノード</td>
+</tr>
+<tr>
+<td><span style="color:#F28E2B;font-size:1.3em;">●</span> 橙</td>
+<td>surface</td>
+<td>表面 species、表面 site、または表面 species を代表する縮退ノード</td>
+</tr>
+<tr>
+<td><span style="color:#59A14F;font-size:1.3em;">●</span> 緑</td>
+<td>bulk / mixed / other</td>
+<td>bulk species、bulk を含むノード、または phase が混在・未分類の縮退ノード</td>
+</tr>
+</tbody>
+</table>
+<p>縮退後の <code>pooling</code> では、1つのノードが複数 species を代表することがある。その場合、色は代表ノードに含まれる主な phase bucket を示す。正確なマージ内容は各 <code>*_node_map.md</code> の <code>Names</code> 欄で確認する。</p>
+<h2 id="2">2. 課題</h2>
+<p>大規模な表面反応機構では、詳細機構をそのまま使うと計算負荷が高い。単純に species や reaction を削ると、次の問題が起きる。</p>
+<ol>
+<li>重要な gas / surface / bulk 経路が欠落する。</li>
+<li>元素保存や非負性が崩れる。</li>
+<li>特定条件では平均誤差が小さくても、別条件で QoI が大きく外れる。</li>
+<li>反応数を強く削るほど、ネットワーク構造の意味が読みにくくなる。</li>
+</ol>
+<p>したがって、縮退は「小さくする」だけでは足りない。物理制約、QoI 精度、ネットワーク構造の可読性を同時に評価する必要がある。</p>
+<h2 id="3">3. ゴール設定</h2>
+<p>本評価のゴールは次の通りである。</p>
+<table>
+<thead>
+<tr>
+<th>goal</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>圧縮</td>
+<td>species 数と reaction 数を削減する</td>
+</tr>
+<tr>
+<td>物理整合</td>
+<td>元素保存、非負性、最低 species/reaction 数、重要相の coverage を守る</td>
+</tr>
+<tr>
+<td>QoI 保持</td>
+<td>主要な濃度、表面被覆率、deposition 指標の誤差を抑える</td>
+</tr>
+<tr>
+<td>汎化評価</td>
+<td><code>adaptive_kfold</code> により、未使用条件への外挿性能を確認する</td>
+</tr>
+<tr>
+<td>可視化</td>
+<td>縮退前後のネットワーク密度とマクロ物性を第三者が比較できるようにする</td>
+</tr>
+</tbody>
+</table>
+<h2 id="4">4. 手法</h2>
+<h3 id="41">4.1 共通表現</h3>
+<p>詳細機構を有向グラフとして表す。</p>
+<p>$$
+G = (V, E)
+$$</p>
+<p>ここで、</p>
+<ul>
+<li>$V$: species または縮退後の状態ノード集合</li>
+<li>$E$: reaction に由来する状態間エッジ集合</li>
+<li>$n = |V|$: ノード数</li>
+<li>$m = |E|$: エッジまたは反応数</li>
+</ul>
+<p>反応系の stoichiometric matrix を次で表す。</p>
+<p>$$
+\nu \in \mathbb{R}^{N_s \times N_r}
+$$</p>
+<ul>
+<li>$N_s$: 縮退前 species 数</li>
+<li>$N_r$: 縮退前 reaction 数</li>
+<li>$\nu_{ij}$: species $i$ の reaction $j$ における正味係数</li>
+</ul>
+<p>縮退では、species または状態を縮約写像 $S$ で低次元に写す。</p>
+<p>$$
+Y = X S
+$$</p>
+<ul>
+<li>$X \in \mathbb{R}^{T \times N_s}$: trace から得た時系列状態量</li>
+<li>$S \in \mathbb{R}^{N_s \times K}$: species から縮退ノードへの写像</li>
+<li>$Y \in \mathbb{R}^{T \times K}$: 縮退後状態</li>
+<li>$K$: 縮退後ノード数</li>
+<li>$T$: 時系列サンプル数</li>
+</ul>
+<p>reaction の選択は keep mask で表す。</p>
+<p>$$
+z_j \in {0, 1}
+$$</p>
+<ul>
+<li>$z_j = 1$: reaction $j$ を保持</li>
+<li>$z_j = 0$: reaction $j$ を削除</li>
+</ul>
+<p>縮退率は次で計算する。</p>
+<p>$$
+r_{\mathrm{sp}} = 1 - \frac{N_s^{\mathrm{after}}}{N_s^{\mathrm{before}}}
+$$</p>
+<p>$$
+r_{\mathrm{rxn}} = 1 - \frac{N_r^{\mathrm{after}}}{N_r^{\mathrm{before}}}
+$$</p>
+<p>QoI 誤差は相対誤差で評価する。</p>
+<p>$$
+\mathrm{relerr}(q) =
+\frac{|q_{\mathrm{reduced}} - q_{\mathrm{full}}|}
+{|q_{\mathrm{full}}| + \epsilon}
+$$</p>
+<ul>
+<li>$q_{\mathrm{full}}$: 詳細機構の QoI</li>
+<li>$q_{\mathrm{reduced}}$: 縮退機構の QoI</li>
+<li>$\epsilon$: ゼロ割り防止の小定数</li>
+</ul>
+<p>平均誤差は次で集計する。</p>
+<p>$$
+\overline{e} = \frac{1}{|\mathcal{Q}|}
+\sum_{q \in \mathcal{Q}} \mathrm{relerr}(q)
+$$</p>
+<ul>
+<li>$\mathcal{Q}$: 評価対象 QoI 集合</li>
+</ul>
+<p>pass rate は、閾値を満たしたケースまたは QoI の割合である。</p>
+<p>$$
+\mathrm{pass_rate} =
+\frac{1}{|\mathcal{C}|}
+\sum_{c \in \mathcal{C}}
+\mathbf{1}\left[e_c \le \tau\right]
+$$</p>
+<ul>
+<li>$\mathcal{C}$: benchmark 条件集合</li>
+<li>$e_c$: 条件 $c$ の誤差</li>
+<li>$\tau$: 合格閾値</li>
+</ul>
+<p>マクロ密度は理想気体近似で確認した。</p>
+<p>$$
+\rho =
+\frac{P \overline{M}}{R T}
+$$</p>
+<ul>
+<li>$\rho$: gas density</li>
+<li>$P$: pressure</li>
+<li>$T$: temperature</li>
+<li>$R$: universal gas constant</li>
+<li>$\overline{M}$: 混合平均分子量</li>
+</ul>
+<p>$$
+\overline{M} = \sum_i X_i M_i
+$$</p>
+<ul>
+<li>$X_i$: gas species $i$ の mole fraction</li>
+<li>$M_i$: species $i$ の分子量</li>
+</ul>
+<p>縮退後の密度は、縮退後ネットワークに残った、またはマージされた gas species を用いて再正規化して計算した。縮退後の独立した Cantera マクロ時系列は保存されていないため、温度と圧力は trace の値を before/after に重ねている。</p>
+<h3 id="42-baseline">4.2 Baseline</h3>
+<p><code>baseline</code> は rule-based な reaction / species 選択を行う。元素 overlap、phase / site mask、物理 floor、balance gate を使い、危険な削除を避ける。</p>
+<p>主な特徴:</p>
+<ul>
+<li>gas / surface の反応分解が追いやすい。</li>
+<li>reaction 数の削減は中程度。</li>
+<li>物理的な診断性が高い。</li>
+</ul>
+<p>選択は、おおまかに次の制約付き最適化として見られる。</p>
+<p>$$
+\max_z \quad \sum_j z_j w_j
+$$</p>
+<p>subject to:</p>
+<p>$$
+N_s^{\mathrm{after}} \ge N_s^{\min}
+$$</p>
+<p>$$
+N_r^{\mathrm{after}} \ge N_r^{\min}
+$$</p>
+<p>$$
+\mathrm{coverage}_{\mathrm{active}} \ge \gamma
+$$</p>
+<ul>
+<li>$w_j$: reaction $j$ の重要度</li>
+<li>$N_s^{\min}$: 最低 species 数</li>
+<li>$N_r^{\min}$: 最低 reaction 数</li>
+<li>$\gamma$: active species coverage の閾値</li>
+</ul>
+<h3 id="43-learnck">4.3 LearnCK++ 型選択</h3>
+<p><code>learnckpp</code> は trace 由来の特徴量から重要 reaction を選び、反応数を強く削減する。選択後に coverage-aware postselect と物理 gate を適用する。</p>
+<p>特徴量の例:</p>
+<p>$$
+\phi_i =
+[
+\max_t X_i(t),
+\mathrm{mean}_t X_i(t),
+\max_t |\dot{\omega}_i(t)|,
+\mathrm{element}(i),
+\mathrm{phase}(i)
+]
+$$</p>
+<ul>
+<li>$\phi_i$: species $i$ の特徴量</li>
+<li>$X_i(t)$: mole fraction または状態量</li>
+<li>$\dot{\omega}_i(t)$: production rate</li>
+</ul>
+<p>reaction 選択の score は次の形で考えられる。</p>
+<p>$$
+s_j = f_{\theta}(\phi_{\mathrm{reactants}}, \phi_{\mathrm{products}}, r_j)
+$$</p>
+<ul>
+<li>$s_j$: reaction $j$ の重要度 score</li>
+<li>$f_{\theta}$: 学習または surrogate による scoring 関数</li>
+<li>$r_j$: reaction 固有特徴</li>
+</ul>
+<p>主な特徴:</p>
+<ul>
+<li>reaction 数を大きく減らせる。</li>
+<li>overall 再合成 reaction になる場合があり、gas/surface の1対1分解は baseline より読みにくい。</li>
+<li>今回は多くのケースで非常に高い reaction reduction を得た。</li>
+</ul>
+<h3 id="44-pooling">4.4 Pooling</h3>
+<p><code>pooling</code> は species をクラスタへ集約する。</p>
+<p>$$
+S_{ik} =
+\begin{cases}
+1 &amp; \text{species } i \text{ が cluster } k \text{ に属する} \
+0 &amp; \text{otherwise}
+\end{cases}
+$$</p>
+<p>クラスタ後の状態は、</p>
+<p>$$
+Y_k(t) = \sum_i X_i(t) S_{ik}
+$$</p>
+<p>となる。</p>
+<p>反応フラックス行列も cluster 空間へ写す。</p>
+<p>$$
+F_{\mathrm{red}} = S^{\top} F S
+$$</p>
+<ul>
+<li>$F$: 縮退前の species 間 reaction flow</li>
+<li>$F_{\mathrm{red}}$: 縮退後 cluster 間 flow</li>
+</ul>
+<p>クラスタリングでは、次のような損失を抑える。</p>
+<p>$$
+\mathcal{L}
+= \mathcal{L}<em _mathrm_phys="\mathrm{phys">{\mathrm{recon}}
++ \lambda</em>}}\mathcal{L<em _mathrm_cov="\mathrm{cov">{\mathrm{phys}}
++ \lambda</em>
+$$}}\mathcal{L}_{\mathrm{coverage}</p>
+<ul>
+<li>$\mathcal{L}_{\mathrm{recon}}$: dynamics reconstruction error</li>
+<li>$\mathcal{L}_{\mathrm{phys}}$: 元素・phase・site などの物理制約違反</li>
+<li>$\mathcal{L}_{\mathrm{coverage}}$: 重要 species / cluster coverage の不足</li>
+<li>$\lambda_{\mathrm{phys}}, \lambda_{\mathrm{cov}}$: 各制約の重み</li>
+</ul>
+<p>主な特徴:</p>
+<ul>
+<li>species 数を最も強く削れる。</li>
+<li>ノードがマージされるため、縮退後ネットワークの可読性は node map と併用する必要がある。</li>
+<li>AC case では species 91.5% 削減、reaction 96.9% 削減を達成した。</li>
+</ul>
+<h3 id="45-workflow">4.5 Workflow</h3>
+<pre><code class="language-mermaid">flowchart TD
+    A[Cantera detailed mechanism] --&gt; B[Generate / load trace HDF5]
+    B --&gt; C[Extract X, wdot, rop, temperature, pressure]
+    C --&gt; D[Build reaction network and stoichiometric matrix]
+    D --&gt; E{Reduction method}
+    E --&gt; F[Baseline rule-based selection]
+    E --&gt; G[LearnCK++ scoring and postselect]
+    E --&gt; H[Pooling / clustering]
+    F --&gt; I[Physical gate]
+    G --&gt; I
+    H --&gt; I
+    I --&gt; J[QoI evaluation with adaptive k-fold]
+    J --&gt; K[Select stage A/B/C]
+    K --&gt; L[Network visualization before / after]
+    K --&gt; M[Macro property comparison]
+    L --&gt; N[Benchmark report]
+    M --&gt; N
+</code></pre>
+<h3 id="46">4.6 縮退手法の学習・選択フロー</h3>
+<p>3手法は、同じ trace と評価 gate を使うが、縮退候補の作り方が異なる。<code>baseline</code> は明示ルール、<code>learnckpp</code> は特徴量に基づく reaction scoring、<code>pooling</code> は species / state のクラスタリングを中心に使う。</p>
+<pre><code class="language-mermaid">flowchart TD
+    A[Trace HDF5] --&gt; B[Feature extraction]
+    B --&gt; B1[X, wdot, rop, time]
+    B --&gt; B2[phase, site, element metadata]
+    B --&gt; B3[QoI metrics]
+
+    B1 --&gt; C{Method branch}
+    B2 --&gt; C
+    B3 --&gt; C
+
+    C --&gt; D[Baseline]
+    D --&gt; D1[Apply hard masks]
+    D1 --&gt; D2[Rank reactions by rule score]
+    D2 --&gt; D3[Keep reactions under floor and coverage constraints]
+
+    C --&gt; E[LearnCK++]
+    E --&gt; E1[Build species / reaction features]
+    E1 --&gt; E2[Score reaction importance]
+    E2 --&gt; E3[Coverage-aware postselect]
+    E3 --&gt; E4[Fallback to baseline if needed]
+
+    C --&gt; F[Pooling]
+    F --&gt; F1[Build graph / flow features]
+    F1 --&gt; F2[Cluster species or states]
+    F2 --&gt; F3[Create mapping matrix S]
+    F3 --&gt; F4[Project dynamics and reaction flow]
+
+    D3 --&gt; G[Physical gate]
+    E4 --&gt; G
+    F4 --&gt; G
+
+    G --&gt; H{Gate passed?}
+    H -- no --&gt; I[Reject or try safer stage]
+    H -- yes --&gt; J[QoI evaluation]
+    I --&gt; J
+    J --&gt; K[Stage A/B/C selection]
+    K --&gt; L[Selected reduced network]
+    L --&gt; M[Network and macro plots]
+</code></pre>
+<p>学習・選択で使う代表的な量は以下である。</p>
+<p>$$
+\Phi =
+\left[
+X,\ \dot{\omega},\ \mathrm{ROP},\ A,\ p,\ s
+\right]
+$$</p>
+<ul>
+<li>$\Phi$: 縮退候補を作るための特徴量集合</li>
+<li>$X$: species mole fraction または state value</li>
+<li>$\dot{\omega}$: species production rate</li>
+<li>$\mathrm{ROP}$: reaction rate of progress</li>
+<li>$A$: element composition や保存量の行列</li>
+<li>$p$: phase label。gas / surface / bulk など</li>
+<li>$s$: site label。surface site type など</li>
+</ul>
+<p><code>learnckpp</code> では reaction $j$ の重要度を、</p>
+<p>$$
+s_j = f_{\theta}(\Phi_j)
+$$</p>
+<p>として求める。ここで、$s_j$ は reaction score、$\Phi_j$ は reaction $j$ に関係する reactant / product / flow 特徴量、$f_{\theta}$ は学習または surrogate に相当する scoring 関数である。</p>
+<p><code>pooling</code> では、species から cluster への写像 $S$ を学習または探索し、縮退後状態を</p>
+<p>$$
+Y = XS
+$$</p>
+<p>として得る。さらに、反応 flow を</p>
+<p>$$
+F_{\mathrm{red}} = S^{\top}FS
+$$</p>
+<p>で cluster 空間へ写す。</p>
+<p>最終選択では、品質と圧縮を同時に見る。</p>
+<p>$$
+\mathrm{score}
+= \alpha r_{\mathrm{rxn}}
++ \beta r_{\mathrm{sp}}
+- \lambda \overline{e}
+- \mu d_{\mathrm{struct}}
+$$</p>
+<ul>
+<li>$r_{\mathrm{rxn}}$: reaction reduction</li>
+<li>$r_{\mathrm{sp}}$: species reduction</li>
+<li>$\overline{e}$: QoI 平均相対誤差</li>
+<li>$d_{\mathrm{struct}}$: structure deficit。coverage や cluster guard の不足量</li>
+<li>$\alpha,\beta,\lambda,\mu$: 各項の重み</li>
+</ul>
+<h3 id="47">4.7 手法比較</h3>
+<table>
+<thead>
+<tr>
+<th>手法</th>
+<th>概要</th>
+<th>コア技術</th>
+<th>メリット</th>
+<th>デメリット</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>baseline</code></td>
+<td>物理ルールと重要度 ranking に基づいて species / reaction を直接選択する。</td>
+<td>hard mask、element overlap、phase/site guard、physics floor、coverage gate、stage A/B/C 探索</td>
+<td>物理的に説明しやすい。gas / surface の反応分解が追いやすい。品質が安定しやすい。</td>
+<td>reaction 削減率は learnckpp / pooling より控えめ。既存ルールに強く依存する。</td>
+</tr>
+<tr>
+<td><code>learnckpp</code></td>
+<td>trace 由来特徴量から reaction importance を評価し、重要 reaction を残す。</td>
+<td>species / reaction feature、surrogate scoring、coverage-aware postselect、fallback policy</td>
+<td>reaction 数を大きく削れる。baseline より aggressive な縮退が可能。</td>
+<td>overall 再合成 reaction になりやすく、反応ドメインの解釈性が下がる。特徴量と scoring の設計に依存する。</td>
+</tr>
+<tr>
+<td><code>pooling</code></td>
+<td>species / state を cluster に集約し、少数の代表ノードで反応ネットワークを表す。</td>
+<td>mapping matrix $S$、graph pooling、cluster guard、flow projection、dynamics reconstruction check</td>
+<td>species 数も reaction 数も強く削れる。巨大機構の粗視化に向く。ネットワーク全体の密度を一気に下げられる。</td>
+<td>ノードが複数 species を代表するため、単独ノードの意味が広くなる。node map なしでは解釈しづらい。</td>
+</tr>
+</tbody>
+</table>
+<p>この比較から、第三者に説明しやすい縮退機構を作るなら <code>baseline</code> が扱いやすい。一方で、計算負荷を最小化したい場合は <code>learnckpp</code> または <code>pooling</code> が有力である。特に <code>pooling</code> は「状態をまとめる」手法なので、縮退後ネットワーク図では node map と併読することが重要である。</p>
+<h2 id="5">5. ベンチマーク結果サマリ</h2>
+<table>
+<thead>
+<tr>
+<th>benchmark</th>
+<th>method</th>
+<th style="text-align: right;">gate</th>
+<th>stage</th>
+<th style="text-align: right;">species before→after</th>
+<th style="text-align: right;">species reduction</th>
+<th style="text-align: right;">reactions before→after</th>
+<th style="text-align: right;">reaction reduction</th>
+<th style="text-align: right;">mandatory pass</th>
+<th style="text-align: right;">mandatory mean</th>
+<th style="text-align: right;">optional mean</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>diamond</td>
+<td>baseline</td>
+<td style="text-align: right;">true</td>
+<td>B</td>
+<td style="text-align: right;">78→43</td>
+<td style="text-align: right;">44.9%</td>
+<td style="text-align: right;">385→203</td>
+<td style="text-align: right;">47.3%</td>
+<td style="text-align: right;">1.000</td>
+<td style="text-align: right;">0.085</td>
+<td style="text-align: right;">0.047</td>
+</tr>
+<tr>
+<td>diamond</td>
+<td>learnckpp</td>
+<td style="text-align: right;">true</td>
+<td>B</td>
+<td style="text-align: right;">78→43</td>
+<td style="text-align: right;">44.9%</td>
+<td style="text-align: right;">385→100</td>
+<td style="text-align: right;">74.0%</td>
+<td style="text-align: right;">0.897</td>
+<td style="text-align: right;">0.208</td>
+<td style="text-align: right;">0.137</td>
+</tr>
+<tr>
+<td>diamond</td>
+<td>pooling</td>
+<td style="text-align: right;">true</td>
+<td>B</td>
+<td style="text-align: right;">78→40</td>
+<td style="text-align: right;">48.7%</td>
+<td style="text-align: right;">385→100</td>
+<td style="text-align: right;">74.0%</td>
+<td style="text-align: right;">0.897</td>
+<td style="text-align: right;">0.208</td>
+<td style="text-align: right;">0.137</td>
+</tr>
+<tr>
+<td>sif4</td>
+<td>baseline</td>
+<td style="text-align: right;">true</td>
+<td>C</td>
+<td style="text-align: right;">82→29</td>
+<td style="text-align: right;">64.6%</td>
+<td style="text-align: right;">365→146</td>
+<td style="text-align: right;">60.0%</td>
+<td style="text-align: right;">0.972</td>
+<td style="text-align: right;">0.152</td>
+<td style="text-align: right;">0.128</td>
+</tr>
+<tr>
+<td>sif4</td>
+<td>learnckpp</td>
+<td style="text-align: right;">true</td>
+<td>C</td>
+<td style="text-align: right;">82→28</td>
+<td style="text-align: right;">65.9%</td>
+<td style="text-align: right;">365→11</td>
+<td style="text-align: right;">97.0%</td>
+<td style="text-align: right;">0.933</td>
+<td style="text-align: right;">0.182</td>
+<td style="text-align: right;">0.168</td>
+</tr>
+<tr>
+<td>sif4</td>
+<td>pooling</td>
+<td style="text-align: right;">true</td>
+<td>C</td>
+<td style="text-align: right;">82→21</td>
+<td style="text-align: right;">74.4%</td>
+<td style="text-align: right;">365→11</td>
+<td style="text-align: right;">97.0%</td>
+<td style="text-align: right;">0.917</td>
+<td style="text-align: right;">0.168</td>
+<td style="text-align: right;">0.245</td>
+</tr>
+<tr>
+<td>ac</td>
+<td>baseline</td>
+<td style="text-align: right;">true</td>
+<td>C</td>
+<td style="text-align: right;">94→33</td>
+<td style="text-align: right;">64.9%</td>
+<td style="text-align: right;">425→170</td>
+<td style="text-align: right;">60.0%</td>
+<td style="text-align: right;">0.951</td>
+<td style="text-align: right;">0.115</td>
+<td style="text-align: right;">0.163</td>
+</tr>
+<tr>
+<td>ac</td>
+<td>learnckpp</td>
+<td style="text-align: right;">true</td>
+<td>C</td>
+<td style="text-align: right;">94→33</td>
+<td style="text-align: right;">64.9%</td>
+<td style="text-align: right;">425→22</td>
+<td style="text-align: right;">94.8%</td>
+<td style="text-align: right;">0.951</td>
+<td style="text-align: right;">0.151</td>
+<td style="text-align: right;">0.221</td>
+</tr>
+<tr>
+<td>ac</td>
+<td>pooling</td>
+<td style="text-align: right;">true</td>
+<td>C</td>
+<td style="text-align: right;">94→8</td>
+<td style="text-align: right;">91.5%</td>
+<td style="text-align: right;">425→13</td>
+<td style="text-align: right;">96.9%</td>
+<td style="text-align: right;">0.951</td>
+<td style="text-align: right;">0.151</td>
+<td style="text-align: right;">0.221</td>
+</tr>
+</tbody>
+</table>
+<p>全9 run で <code>gate=true</code>、primary blocker は <code>none</code> だった。<code>baseline</code> は品質面で安定し、<code>learnckpp</code> と <code>pooling</code> は reaction reduction が非常に大きい。</p>
+<h2 id="6">6. ケース別結果</h2>
+<h3 id="61-diamond-baseline">6.1 Diamond / Baseline</h3>
+<p>縮退前は 78 species / 385 reactions、縮退後は 43 species / 203 reactions。reaction reduction は 47.3%。baseline は削減率を抑えつつ、mandatory mean 0.085 と最も良い品質を示した。</p>
+<table>
+<thead>
+<tr>
+<th>before</th>
+<th>after</th>
+<th>macro</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><img alt="" src="reports/eval53viz_labeled_networks/eval53viz_diamond_large_baseline_before_raw_simple.png"></td>
+<td><img alt="" src="reports/eval53viz_labeled_networks/eval53viz_diamond_large_baseline_after_reduced_simple.png"></td>
+<td><img alt="" src="reports/eval53viz_labeled_networks/eval53viz_diamond_large_baseline_macro_compare.png"></td>
+</tr>
+</tbody>
+</table>
+<p>Node maps:</p>
+<ul>
+<li><a href="reports/eval53viz_labeled_networks/eval53viz_diamond_large_baseline_before_raw_simple_node_map.md">before node map</a></li>
+<li><a href="reports/eval53viz_labeled_networks/eval53viz_diamond_large_baseline_after_reduced_simple_node_map.md">after node map</a></li>
+</ul>
+<h3 id="62-diamond-learnck">6.2 Diamond / LearnCK++</h3>
+<p>縮退後は 43 species / 100 reactions。reaction reduction は 74.0%。baseline と species 数は同等だが、reaction 数を大きく削った。mandatory mean は 0.208 で、baseline より誤差は大きいが gate は通過した。</p>
+<table>
+<thead>
+<tr>
+<th>before</th>
+<th>after</th>
+<th>macro</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><img alt="" src="reports/eval53viz_labeled_networks/eval53viz_diamond_large_learnckpp_before_raw_simple.png"></td>
+<td><img alt="" src="reports/eval53viz_labeled_networks/eval53viz_diamond_large_learnckpp_after_reduced_simple.png"></td>
+<td><img alt="" src="reports/eval53viz_labeled_networks/eval53viz_diamond_large_learnckpp_macro_compare.png"></td>
+</tr>
+</tbody>
+</table>
+<p>Node maps:</p>
+<ul>
+<li><a href="reports/eval53viz_labeled_networks/eval53viz_diamond_large_learnckpp_before_raw_simple_node_map.md">before node map</a></li>
+<li><a href="reports/eval53viz_labeled_networks/eval53viz_diamond_large_learnckpp_after_reduced_simple_node_map.md">after node map</a></li>
+</ul>
+<h3 id="63-diamond-pooling">6.3 Diamond / Pooling</h3>
+<p>縮退後は 40 species / 100 reactions。species reduction は 48.7%、reaction reduction は 74.0%。learnckpp と同等の reaction 数で、species をさらに削った。ノードのマージが増えるため、対応表で cluster 内容を確認する必要がある。</p>
+<table>
+<thead>
+<tr>
+<th>before</th>
+<th>after</th>
+<th>macro</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><img alt="" src="reports/eval53viz_labeled_networks/eval53viz_diamond_large_pooling_before_raw_simple.png"></td>
+<td><img alt="" src="reports/eval53viz_labeled_networks/eval53viz_diamond_large_pooling_after_reduced_simple.png"></td>
+<td><img alt="" src="reports/eval53viz_labeled_networks/eval53viz_diamond_large_pooling_macro_compare.png"></td>
+</tr>
+</tbody>
+</table>
+<p>Node maps:</p>
+<ul>
+<li><a href="reports/eval53viz_labeled_networks/eval53viz_diamond_large_pooling_before_raw_simple_node_map.md">before node map</a></li>
+<li><a href="reports/eval53viz_labeled_networks/eval53viz_diamond_large_pooling_after_reduced_simple_node_map.md">after node map</a></li>
+</ul>
+<h3 id="64-sif4-baseline">6.4 SiF4 / Baseline</h3>
+<p>縮退後は 29 species / 146 reactions。species reduction は 64.6%、reaction reduction は 60.0%。mandatory pass は 0.972 と高く、品質と削減率のバランスが良い。</p>
+<table>
+<thead>
+<tr>
+<th>before</th>
+<th>after</th>
+<th>macro</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><img alt="" src="reports/eval53viz_labeled_networks/eval53viz_sif4_large_baseline_before_raw_simple.png"></td>
+<td><img alt="" src="reports/eval53viz_labeled_networks/eval53viz_sif4_large_baseline_after_reduced_simple.png"></td>
+<td><img alt="" src="reports/eval53viz_labeled_networks/eval53viz_sif4_large_baseline_macro_compare.png"></td>
+</tr>
+</tbody>
+</table>
+<p>Node maps:</p>
+<ul>
+<li><a href="reports/eval53viz_labeled_networks/eval53viz_sif4_large_baseline_before_raw_simple_node_map.md">before node map</a></li>
+<li><a href="reports/eval53viz_labeled_networks/eval53viz_sif4_large_baseline_after_reduced_simple_node_map.md">after node map</a></li>
+</ul>
+<h3 id="65-sif4-learnck">6.5 SiF4 / LearnCK++</h3>
+<p>縮退後は 28 species / 11 reactions。reaction reduction は 97.0%。非常に強い reaction 圧縮を達成した。mandatory mean は 0.182 で gate は通過しているが、縮退後ネットワークはかなり粗い。</p>
+<table>
+<thead>
+<tr>
+<th>before</th>
+<th>after</th>
+<th>macro</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><img alt="" src="reports/eval53viz_labeled_networks/eval53viz_sif4_large_learnckpp_before_raw_simple.png"></td>
+<td><img alt="" src="reports/eval53viz_labeled_networks/eval53viz_sif4_large_learnckpp_after_reduced_simple.png"></td>
+<td><img alt="" src="reports/eval53viz_labeled_networks/eval53viz_sif4_large_learnckpp_macro_compare.png"></td>
+</tr>
+</tbody>
+</table>
+<p>Node maps:</p>
+<ul>
+<li><a href="reports/eval53viz_labeled_networks/eval53viz_sif4_large_learnckpp_before_raw_simple_node_map.md">before node map</a></li>
+<li><a href="reports/eval53viz_labeled_networks/eval53viz_sif4_large_learnckpp_after_reduced_simple_node_map.md">after node map</a></li>
+</ul>
+<h3 id="66-sif4-pooling">6.6 SiF4 / Pooling</h3>
+<p>縮退後は 21 species / 11 reactions。species reduction は 74.4%、reaction reduction は 97.0%。learnckpp と同じ reaction 数まで落としつつ、species 数もさらに削った。optional mean は 0.245 と3手法中では大きめである。</p>
+<table>
+<thead>
+<tr>
+<th>before</th>
+<th>after</th>
+<th>macro</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><img alt="" src="reports/eval53viz_labeled_networks/eval53viz_sif4_large_pooling_before_raw_simple.png"></td>
+<td><img alt="" src="reports/eval53viz_labeled_networks/eval53viz_sif4_large_pooling_after_reduced_simple.png"></td>
+<td><img alt="" src="reports/eval53viz_labeled_networks/eval53viz_sif4_large_pooling_macro_compare.png"></td>
+</tr>
+</tbody>
+</table>
+<p>Node maps:</p>
+<ul>
+<li><a href="reports/eval53viz_labeled_networks/eval53viz_sif4_large_pooling_before_raw_simple_node_map.md">before node map</a></li>
+<li><a href="reports/eval53viz_labeled_networks/eval53viz_sif4_large_pooling_after_reduced_simple_node_map.md">after node map</a></li>
+</ul>
+<h3 id="67-ac-baseline">6.7 AC / Baseline</h3>
+<p>縮退後は 33 species / 170 reactions。species reduction は 64.9%、reaction reduction は 60.0%。mandatory mean は 0.115 で、AC benchmark では品質が最も良い。</p>
+<table>
+<thead>
+<tr>
+<th>before</th>
+<th>after</th>
+<th>macro</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><img alt="" src="reports/eval53viz_labeled_networks/eval53viz_ac_large_baseline_before_raw_simple.png"></td>
+<td><img alt="" src="reports/eval53viz_labeled_networks/eval53viz_ac_large_baseline_after_reduced_simple.png"></td>
+<td><img alt="" src="reports/eval53viz_labeled_networks/eval53viz_ac_large_baseline_macro_compare.png"></td>
+</tr>
+</tbody>
+</table>
+<p>Node maps:</p>
+<ul>
+<li><a href="reports/eval53viz_labeled_networks/eval53viz_ac_large_baseline_before_raw_simple_node_map.md">before node map</a></li>
+<li><a href="reports/eval53viz_labeled_networks/eval53viz_ac_large_baseline_after_reduced_simple_node_map.md">after node map</a></li>
+</ul>
+<h3 id="68-ac-learnck">6.8 AC / LearnCK++</h3>
+<p>縮退後は 33 species / 22 reactions。species 数は baseline と同じだが、reaction 数は 22 まで減った。reaction reduction は 94.8%。mandatory mean は 0.151 で、強い圧縮の割に品質は維持されている。</p>
+<table>
+<thead>
+<tr>
+<th>before</th>
+<th>after</th>
+<th>macro</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><img alt="" src="reports/eval53viz_labeled_networks/eval53viz_ac_large_learnckpp_before_raw_simple.png"></td>
+<td><img alt="" src="reports/eval53viz_labeled_networks/eval53viz_ac_large_learnckpp_after_reduced_simple.png"></td>
+<td><img alt="" src="reports/eval53viz_labeled_networks/eval53viz_ac_large_learnckpp_macro_compare.png"></td>
+</tr>
+</tbody>
+</table>
+<p>Node maps:</p>
+<ul>
+<li><a href="reports/eval53viz_labeled_networks/eval53viz_ac_large_learnckpp_before_raw_simple_node_map.md">before node map</a></li>
+<li><a href="reports/eval53viz_labeled_networks/eval53viz_ac_large_learnckpp_after_reduced_simple_node_map.md">after node map</a></li>
+</ul>
+<h3 id="69-ac-pooling">6.9 AC / Pooling</h3>
+<p>縮退後は 8 species / 13 reactions。species reduction は 91.5%、reaction reduction は 96.9%。今回の中で最も強い縮退である。マージによりノード数が大きく減るため、縮退後ネットワークは非常に粗いが、mandatory pass は 0.951 を維持した。</p>
+<table>
+<thead>
+<tr>
+<th>before</th>
+<th>after</th>
+<th>macro</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><img alt="" src="reports/eval53viz_labeled_networks/eval53viz_ac_large_pooling_before_raw_simple.png"></td>
+<td><img alt="" src="reports/eval53viz_labeled_networks/eval53viz_ac_large_pooling_after_reduced_simple.png"></td>
+<td><img alt="" src="reports/eval53viz_labeled_networks/eval53viz_ac_large_pooling_macro_compare.png"></td>
+</tr>
+</tbody>
+</table>
+<p>Node maps:</p>
+<ul>
+<li><a href="reports/eval53viz_labeled_networks/eval53viz_ac_large_pooling_before_raw_simple_node_map.md">before node map</a></li>
+<li><a href="reports/eval53viz_labeled_networks/eval53viz_ac_large_pooling_after_reduced_simple_node_map.md">after node map</a></li>
+</ul>
+<h2 id="7">7. 考察</h2>
+<h3 id="71-baseline">7.1 品質重視なら Baseline</h3>
+<p><code>baseline</code> は3 benchmark すべてで、mandatory mean が最も小さい。特に <code>diamond</code> では 0.085、<code>ac</code> では 0.115 であり、縮退後も QoI の安定性が高い。reaction reduction は 47.3% から 60.0% に留まるが、第三者がネットワークを読むには最も解釈しやすい。</p>
+<h3 id="72-learnck-pooling">7.2 圧縮重視なら LearnCK++ または Pooling</h3>
+<p><code>learnckpp</code> と <code>pooling</code> は reaction 数を大きく削る。<code>sif4</code> では 365→11、<code>ac/pooling</code> では 425→13 まで削減した。とくに <code>pooling</code> は species も強く削れるため、巨大機構の粗視化には有効である。</p>
+<p>一方で、マージ後ノードは複数 species を代表するため、ノード単体の物理的意味は広くなる。したがって、縮退後ネットワーク図だけではなく、必ず node map と併用する必要がある。</p>
+<h3 id="73">7.3 マクロ物性の読み方</h3>
+<p>マクロ比較図では、temperature と pressure は before/after が重なる。これは縮退後の独立した Cantera 再積分結果が保存されておらず、trace の値を共通に使っているためである。</p>
+<p>density は、縮退後ネットワークに含まれる gas species を用いて再正規化した理想気体密度である。したがって、これは「縮退後 gas basis で見た密度の整合性チェック」として読むのが適切である。</p>
+<h3 id="74">7.4 ネットワーク図から見える傾向</h3>
+<p>縮退前ネットワークは全 benchmark で高密度であり、多数の状態が反応で結ばれている。縮退後は、baseline では密度を残した中規模ネットワーク、learnckpp では reaction が大きく間引かれた疎なネットワーク、pooling では少数の代表ノードに集約された粗いネットワークになる。</p>
+<p>この差は、手法の思想をよく反映している。</p>
+<ul>
+<li>baseline: 解釈性と安全性を優先</li>
+<li>learnckpp: reaction 数削減を優先</li>
+<li>pooling: species / state aggregation を優先</li>
+</ul>
+<h3 id="75">7.5 今後の改善点</h3>
+<p>今回の可視化では、縮退後の独立した Cantera trajectory が保存されていない。次の評価では、縮退機構そのものを Cantera で再実行し、temperature、pressure、density、deposition rate の full vs reduced trajectory を直接比較するのが望ましい。</p>
+<p>また、pooling と learnckpp の縮退後 reaction は overall 再合成になりやすい。実務利用では、overall reaction に domain tag、元 reaction index、gas/surface/bulk の由来を保持すると、第三者がより解釈しやすくなる。</p>
+<h2 id="8">8. 付録</h2>
+<p>関連ファイル:</p>
+<ul>
+<li><a href="reports/eval53viz_labeled_networks/index.md">network index</a></li>
+<li><a href="reports/eval53viz_labeled_networks/macro_compare_index.md">macro compare index</a></li>
+<li><a href="reports/eval53viz_labeled_networks/macro_compare_all.csv">all macro CSV</a></li>
+</ul>
+<p>生成スクリプト:</p>
+<ul>
+<li><a href="tools/generate_simple_network_graphs.py">network graph generator</a></li>
+<li><a href="tools/generate_macro_compare_plots.py">macro compare generator</a></li>
+</ul>
+</body>
+</html>
