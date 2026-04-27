@@ -1,0 +1,11 @@
+digraph G {
+  rankdir=LR;
+  label="ac pooling_proxy ratio_300 network";
+  "C2H2" [shape=ellipse];
+  "C2H4" [shape=ellipse];
+  "H2" [shape=ellipse];
+  "R0" [shape=box];
+  "C2H4" -> "R0" [label="reactant"];
+  "R0" -> "C2H2" [label="product"];
+  "R0" -> "H2" [label="product"];
+}

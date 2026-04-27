@@ -1093,19 +1093,10 @@ def run(
     manifest_cfg["sim"] = manifest_sim_cfg
 
     backend_name = _backend_name(sim_cfg)
-    backend = resolve_backend(backend_name, registry=registry)
-
-    dataset = backend.run(sim_cfg)
     run_id = make_run_id(manifest_cfg, exclude_keys=("hydra",))
     inputs: dict[str, Any] = {}
-    applied_multipliers = normalized_multipliers
-    dataset_attrs = getattr(dataset, "attrs", None)
-    if isinstance(dataset_attrs, Mapping) and "reaction_multipliers" in dataset_attrs:
-        applied = dataset_attrs.get("reaction_multipliers")
-        if applied:
-            applied_multipliers = applied
-    if applied_multipliers:
-        inputs["reaction_multipliers"] = applied_multipliers
+    if normalized_multipliers:
+        inputs["reaction_multipliers"] = normalized_multipliers
     manifest = build_manifest(
         kind="runs",
         artifact_id=run_id,
@@ -1114,6 +1105,8 @@ def run(
     )
 
     def _writer(base_dir: Path) -> None:
+        backend = resolve_backend(backend_name, registry=registry)
+        dataset = backend.run(sim_cfg)
         dump_run_dataset(dataset, base_dir / RUN_STATE_DIRNAME)
 
     result = store.ensure(manifest, writer=_writer)

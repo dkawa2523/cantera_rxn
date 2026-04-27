@@ -57,6 +57,19 @@ class MissingObservable(Observable):
         raise RuntimeError("missing observable compute should not be called")
 
 
+class CountingTemperatureObservable(Observable):
+    name = "test.count_T"
+    requires = ("T",)
+
+    def __init__(self) -> None:
+        self.calls = 0
+
+    def compute(self, run_dataset: RunDatasetView, cfg: dict[str, Any]) -> dict[str, Any]:
+        self.calls += 1
+        series = run_dataset.data_vars.get("T", {}).get("data", [])
+        return {"value": float(series[-1]), "unit": "K", "meta": {"method": "last"}}
+
+
 def test_observables_run_handles_missing_inputs(tmp_path) -> None:
     register("observable", "test.mean_T", MeanTemperatureObservable(), overwrite=True)
     register("observable", "test.missing", MissingObservable(), overwrite=True)
@@ -103,3 +116,43 @@ def test_observables_run_handles_missing_inputs(tmp_path) -> None:
     meta = json.loads(missing_row["meta_json"])
     assert meta.get("status") in {"missing_input", "skipped"}
     assert any("not_present" in item for item in meta.get("missing", []))
+
+
+def test_observables_skip_omits_missing_rows_and_cache_reuses(tmp_path) -> None:
+    missing = MissingObservable()
+    counter = CountingTemperatureObservable()
+    register("observable", "test.missing", missing, overwrite=True)
+    register("observable", "test.count_T", counter, overwrite=True)
+
+    store = ArtifactStore(tmp_path / "artifacts")
+    sim_task = get("task", "sim.run")
+    sim_result = sim_task(
+        {
+            "sim": {
+                "name": "dummy",
+                "time": {"start": 0.0, "stop": 1.0, "steps": 2},
+                "initial": {"T": 300.0},
+                "ramp": {"T": 10.0},
+                "species": ["A", "B"],
+            }
+        },
+        store=store,
+    )
+
+    obs_task = get("task", "observables.run")
+    skip_cfg = {
+        "inputs": {"run_id": sim_result.manifest.id},
+        "params": {
+            "observables": ["test.count_T", "test.missing"],
+            "missing_strategy": "skip",
+        },
+    }
+    first = obs_task(skip_cfg, store=store)
+    second = obs_task(skip_cfg, store=store)
+
+    rows = _read_values(first.path / "values.parquet")
+    assert first.reused is False
+    assert second.reused is True
+    assert counter.calls == 1
+    assert first.manifest.inputs["missing_strategy"] == "skip"
+    assert [row["observable"] for row in rows] == ["test.count_T"]

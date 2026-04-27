@@ -1,0 +1,10 @@
+{
+  "ac_large.yaml": "copy of local benchmarks/assets/mechanisms/gri30.yaml",
+  "conditions": [
+    "ac:dilute_N2",
+    "sif4:add_O2"
+  ],
+  "kind": "generated_proxy_assets",
+  "note": "These assets are Cantera-readable proxies generated because the original eval53 large mechanisms are not present in this checkout.",
+  "sif4_large.yaml": "synthetic constant-cp SiF4/NH3/O2 gas-phase proxy"
+}

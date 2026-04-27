@@ -1,0 +1,12 @@
+{
+  "benchmark": "gri30",
+  "level": "ratio_250",
+  "mechanism_reduced": "reports/eval53_large_reduction_effects_sweep_smoke/output/gri30/learnck/ratio_250/mechanism_reduced.yaml",
+  "method": "learnck",
+  "method_label": "learnck_style_proxy",
+  "reactions_after": 82,
+  "reactions_before": 325,
+  "species_after": 53,
+  "species_before": 53,
+  "status": "success"
+}

@@ -1,0 +1,31 @@
+digraph G {
+  rankdir=LR;
+  label="sif4 baseline_proxy ratio_500 network";
+  "F" [shape=ellipse];
+  "F2" [shape=ellipse];
+  "H" [shape=ellipse];
+  "H2" [shape=ellipse];
+  "HF" [shape=ellipse];
+  "HO2" [shape=ellipse];
+  "O2" [shape=ellipse];
+  "R0" [shape=box];
+  "R1" [shape=box];
+  "R2" [shape=box];
+  "R3" [shape=box];
+  "R4" [shape=box];
+  "F" -> "R0" [label="reactant"];
+  "H2" -> "R0" [label="reactant"];
+  "R0" -> "H" [label="product"];
+  "R0" -> "HF" [label="product"];
+  "F2" -> "R1" [label="reactant"];
+  "H" -> "R1" [label="reactant"];
+  "R1" -> "F" [label="product"];
+  "R1" -> "HF" [label="product"];
+  "H" -> "R2" [label="reactant"];
+  "O2" -> "R2" [label="reactant"];
+  "R2" -> "HO2" [label="product"];
+  "H" -> "R3" [label="reactant"];
+  "R3" -> "H2" [label="product"];
+  "F" -> "R4" [label="reactant"];
+  "R4" -> "F2" [label="product"];
+}

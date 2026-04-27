@@ -1,0 +1,93 @@
+# gri30 pooling_proxy mild network
+
+- mechanism: `reports/eval53_large_reduction_effects_smoke/output/gri30/pooling_proxy/mild/mechanism_reduced.yaml`
+
+## Drawn Nodes
+- `C2H`
+- `C2H2`
+- `C2H3`
+- `C2H4`
+- `C2H5`
+- `C3H7`
+- `C3H8`
+- `CH`
+- `CH2`
+- `CH2CHO`
+- `CH2CO`
+- `CH2O`
+- `CH3`
+- `CN`
+- `H`
+- `H2CN`
+- `HCN`
+- `HCNN`
+- `HCO`
+- `N2`
+- `R5`
+- `R9`
+- `R23`
+- `R24`
+- `R25`
+- `R27`
+- `R82`
+- `R83`
+- `R84`
+- `R94`
+- `R97`
+- `R100`
+
+## Selection Map
+
+- H2: kept=True representative=H2 reason=protected,selected
+- H: kept=True representative=H reason=selected
+- O: kept=False representative=O reason=removed
+- O2: kept=True representative=O2 reason=protected,selected
+- OH: kept=False representative=OH reason=removed
+- H2O: kept=True representative=H2O reason=protected,selected
+- HO2: kept=False representative=HO2 reason=removed
+- H2O2: kept=True representative=H2O2 reason=selected
+- C: kept=True representative=C reason=selected
+- CH: kept=True representative=CH reason=selected
+- CH2: kept=True representative=CH2(S) reason=selected
+- CH2(S): kept=True representative=CH2(S) reason=selected
+- CH3: kept=True representative=CH3 reason=selected
+- CH4: kept=True representative=CH4 reason=protected,selected
+- CO: kept=True representative=CO reason=protected,selected
+- CO2: kept=True representative=CO2 reason=protected,selected
+- HCO: kept=True representative=HCO reason=selected
+- CH2O: kept=True representative=CH2O reason=selected
+- CH2OH: kept=True representative=CH3O reason=selected
+- CH3O: kept=True representative=CH3O reason=selected
+- CH3OH: kept=True representative=CH3OH reason=selected
+- C2H: kept=True representative=C2H reason=selected
+- C2H2: kept=True representative=C2H2 reason=protected,selected
+- C2H3: kept=True representative=C2H3 reason=selected
+- C2H4: kept=True representative=C2H4 reason=protected,selected
+- C2H5: kept=True representative=C2H5 reason=selected
+- C2H6: kept=True representative=C2H6 reason=selected
+- HCCO: kept=True representative=HCCO reason=selected
+- CH2CO: kept=True representative=HCCOH reason=selected
+- HCCOH: kept=True representative=HCCOH reason=selected
+- N: kept=False representative=N reason=removed
+- NH: kept=False representative=NH reason=removed
+- NH2: kept=False representative=NH2 reason=removed
+- NH3: kept=True representative=NH3 reason=protected,selected
+- NNH: kept=False representative=NNH reason=removed
+- NO: kept=False representative=NO reason=removed
+- NO2: kept=False representative=NO2 reason=removed
+- N2O: kept=False representative=N2O reason=removed
+- HNO: kept=False representative=HNO reason=removed
+- CN: kept=True representative=CN reason=selected
+- HCN: kept=True representative=HCN reason=selected
+- H2CN: kept=True representative=H2CN reason=selected
+- HCNN: kept=True representative=HCNN reason=selected
+- HCNO: kept=True representative=HOCN reason=selected
+- HOCN: kept=False representative=HOCN reason=removed
+- HNCO: kept=True representative=HOCN reason=selected
+- NCO: kept=False representative=NCO reason=removed
+- N2: kept=True representative=N2 reason=protected,selected
+- AR: kept=True representative=AR reason=selected
+- C3H7: kept=True representative=C3H7 reason=selected
+- C3H8: kept=True representative=C3H8 reason=selected
+- CH2CHO: kept=True representative=CH2CHO reason=selected
+- CH3CHO: kept=True representative=CH3CHO reason=selected

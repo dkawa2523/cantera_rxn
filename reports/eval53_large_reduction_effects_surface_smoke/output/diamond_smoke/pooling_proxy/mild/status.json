@@ -1,0 +1,12 @@
+{
+  "benchmark": "diamond_smoke",
+  "level": "mild",
+  "mechanism_reduced": "reports/eval53_large_reduction_effects_surface_smoke/output/diamond_smoke/pooling_proxy/mild/mechanism_reduced.yaml",
+  "method": "pooling_proxy",
+  "method_label": "pooling_proxy",
+  "reactions_after": 20,
+  "reactions_before": 20,
+  "species_after": 13,
+  "species_before": 13,
+  "status": "success"
+}

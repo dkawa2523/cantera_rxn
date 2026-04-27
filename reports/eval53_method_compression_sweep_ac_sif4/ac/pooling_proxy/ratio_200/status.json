@@ -1,0 +1,12 @@
+{
+  "benchmark": "ac",
+  "level": "ratio_200",
+  "mechanism_reduced": "reports/eval53_method_compression_sweep_ac_sif4/ac/pooling_proxy/ratio_200/mechanism_reduced.yaml",
+  "method": "pooling_proxy",
+  "method_label": "pooling_proxy",
+  "reactions_after": 0,
+  "reactions_before": 325,
+  "species_after": 11,
+  "species_before": 53,
+  "status": "success"
+}

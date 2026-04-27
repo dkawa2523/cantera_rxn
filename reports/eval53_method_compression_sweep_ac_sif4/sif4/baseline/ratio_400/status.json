@@ -1,0 +1,12 @@
+{
+  "benchmark": "sif4",
+  "level": "ratio_400",
+  "mechanism_reduced": "reports/eval53_method_compression_sweep_ac_sif4/sif4/baseline/ratio_400/mechanism_reduced.yaml",
+  "method": "baseline",
+  "method_label": "baseline_proxy",
+  "reactions_after": 4,
+  "reactions_before": 41,
+  "species_after": 11,
+  "species_before": 26,
+  "status": "success"
+}

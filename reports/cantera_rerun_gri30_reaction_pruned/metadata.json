@@ -1,0 +1,20 @@
+{
+  "cantera_version": "3.1.0",
+  "full_mechanism": "C:\\Users\\user\\Desktop\\cantera_rxn_push\\benchmarks\\assets\\mechanisms\\gri30.yaml",
+  "reduced_mechanism": "C:\\Users\\user\\Desktop\\cantera_rxn_push\\reports\\cantera_rerun_gri30_reaction_pruned\\gri30_reaction_pruned_229_of_325.yaml",
+  "generated_reduced": true,
+  "conditions": "C:\\Users\\user\\Desktop\\cantera_rxn_push\\benchmarks\\assets\\conditions\\gri30_small.csv",
+  "fuel": "CH4:1",
+  "oxidizer": "O2:1, N2:3.76",
+  "keep_fraction": 0.7,
+  "n_points": 180,
+  "major_species": [
+    "CH4",
+    "O2",
+    "CO2",
+    "H2O",
+    "CO",
+    "H2",
+    "OH"
+  ]
+}

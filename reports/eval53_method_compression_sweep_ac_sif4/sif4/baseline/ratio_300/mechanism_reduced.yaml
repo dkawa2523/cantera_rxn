@@ -1,0 +1,82 @@
+generator: YamlWriter
+cantera-version: 3.1.0
+git-commit: '6e00275'
+date: Mon Apr 27 11:09:35 2026
+phases:
+  - name: gas_baseline_ratio_300
+    thermo: ideal-gas
+    elements: [H, O, N, F, Si]
+    species: [H2, O2, H2O, N2, NH3, F, F2, SiF4]
+    kinetics: bulk
+    state:
+      T: 1.0e-03
+      density: 1.0e-03
+      Y: {H2: 1.0}
+species:
+  - name: H2
+    composition: {H: 2.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: O2
+    composition: {O: 2.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: H2O
+    composition: {H: 2.0, O: 1.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: N2
+    composition: {N: 2.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: NH3
+    composition: {H: 3.0, N: 1.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: F
+    composition: {F: 1.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: F2
+    composition: {F: 2.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: SiF4
+    composition: {F: 4.0, Si: 1.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+reactions:
+  - equation: 2 F <=> F2
+    rate-constant: {A: 4.4e+04, b: 0.0, Ea: 2.15e+04}

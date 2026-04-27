@@ -1,0 +1,12 @@
+{
+  "benchmark": "gri30",
+  "level": "mild",
+  "mechanism_reduced": "reports/eval53_large_reduction_effects_smoke/output/gri30/pooling_proxy/mild/mechanism_reduced.yaml",
+  "method": "pooling_proxy",
+  "method_label": "pooling_proxy",
+  "reactions_after": 104,
+  "reactions_before": 325,
+  "species_after": 40,
+  "species_before": 53,
+  "status": "success"
+}

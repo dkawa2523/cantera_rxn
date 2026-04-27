@@ -2,15 +2,16 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from json import JSONDecodeError
+import logging
 from pathlib import Path
 from typing import Any, Iterable, Optional
 
 from rxn_platform.core import ArtifactManifest
 from rxn_platform.errors import ArtifactError, ConfigError
 from rxn_platform.hydra_utils import resolve_config
-from rxn_platform.io_utils import read_json
+from rxn_platform.io_utils import read_json, write_json_atomic
 from rxn_platform.metadata import code_metadata, provenance_metadata
 from rxn_platform.run_store import resolve_run_dataset_dir, utc_now_iso
 
@@ -20,8 +21,10 @@ except ImportError:  # pragma: no cover - optional dependency
     pd = None
 
 try:  # Optional dependency.
+    import pyarrow as pa
     import pyarrow.parquet as pq
 except ImportError:  # pragma: no cover - optional dependency
+    pa = None
     pq = None
 
 
@@ -112,6 +115,59 @@ def read_table_rows(path: Path) -> list[dict[str, Any]]:
     return _read_json_rows(path)
 
 
+def _arrow_type(name: str) -> Any:
+    if pa is None:
+        return None
+    if name in {"float", "float64", "number"}:
+        return pa.float64()
+    if name in {"int", "int64", "integer"}:
+        return pa.int64()
+    if name in {"bool", "boolean"}:
+        return pa.bool_()
+    return pa.string()
+
+
+def write_table_rows(
+    rows: Sequence[Mapping[str, Any]],
+    path: Path,
+    *,
+    columns: Sequence[str],
+    column_types: Optional[Mapping[str, str]] = None,
+    logger_name: str = "rxn_platform.tasks",
+) -> None:
+    """Write a small task table, falling back to JSON with a sidecar copy."""
+    row_list = list(rows)
+    column_list = [str(column) for column in columns]
+    if pd is not None:
+        frame = pd.DataFrame(row_list, columns=column_list)
+        try:
+            frame.to_parquet(path, index=False)
+            return
+        except Exception:
+            pass
+    if pa is not None and pq is not None:
+        types = dict(column_types or {})
+        schema = pa.schema(
+            [
+                (column, _arrow_type(types.get(column, "string")))
+                for column in column_list
+            ]
+        )
+        table = pa.Table.from_pylist(row_list, schema=schema)
+        pq.write_table(table, path)
+        return
+    payload = {"columns": column_list, "rows": row_list}
+    write_json_atomic(path, payload)
+    json_path = path.with_suffix(".json")
+    if json_path != path:
+        write_json_atomic(json_path, payload)
+    logging.getLogger(logger_name).warning(
+        "Parquet writer unavailable; stored JSON payload at %s and %s.",
+        path,
+        json_path,
+    )
+
+
 def load_run_dataset_payload(
     run_dir: Path,
     *,
@@ -154,6 +210,7 @@ def load_run_dataset_payload(
     }
     return {"coords": coords, "data_vars": data_vars, "attrs": dict(dataset.attrs)}
 
+
 def load_run_ids_from_run_set(store: Any, run_set_id: str) -> list[str]:
     """Load run_ids from a run_sets artifact.
 
@@ -191,4 +248,5 @@ __all__ = [
     "provenance_metadata",
     "read_table_rows",
     "resolve_cfg",
+    "write_table_rows",
 ]

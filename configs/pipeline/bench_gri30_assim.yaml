@@ -10,7 +10,10 @@ steps:
     task: observables.compute
     inputs: { runs: "@sim" }
     params:
-      observables: [gas_composition, temperature_summary]
+      observables:
+        gas_composition:
+          stats: [last]
+          species: [CO2, CO]
   - id: assim
     task: assimilation.eki
     inputs: { runs: "@sim", observables: "@obs" }
@@ -22,6 +25,6 @@ steps:
       max_iter: 8
       seed: 0
   - id: viz
-    task: viz.make
+    task: viz.ds_dashboard
     inputs: { assimilation: "@assim", runs: "@sim" }
     params: { dashboard: ds }

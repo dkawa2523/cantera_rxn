@@ -1,0 +1,75 @@
+# sif4 pooling_proxy ratio_750 network
+
+- mechanism: `reports/eval53_method_compression_sweep_ac_sif4/sif4/pooling_proxy/ratio_750/mechanism_reduced.yaml`
+
+## Drawn Nodes
+- `F`
+- `F2`
+- `H`
+- `H2`
+- `H2O`
+- `H2O2`
+- `HF`
+- `HNO`
+- `HO2`
+- `N`
+- `N2`
+- `NH`
+- `NH2`
+- `NH3`
+- `NO`
+- `O`
+- `O2`
+- `OH`
+- `R0`
+- `R1`
+- `R2`
+- `R3`
+- `R4`
+- `R5`
+- `R6`
+- `R7`
+- `R8`
+- `R9`
+- `R10`
+- `R11`
+- `R12`
+- `R13`
+- `R14`
+- `R15`
+- `R16`
+- `R17`
+- `R18`
+- `R19`
+- `R20`
+- `R21`
+- `R22`
+
+## Selection Map
+
+- H: kept=True representative=H reason=selected
+- H2: kept=True representative=H2 reason=protected,selected
+- O: kept=True representative=O reason=selected
+- O2: kept=True representative=O2 reason=protected,selected
+- OH: kept=True representative=OH reason=selected
+- HO2: kept=True representative=HO2 reason=selected
+- H2O: kept=True representative=H2O reason=protected,selected
+- H2O2: kept=True representative=H2O2 reason=selected
+- N: kept=True representative=N reason=selected
+- N2: kept=True representative=N2 reason=protected,selected
+- NH: kept=True representative=NH reason=selected
+- NH2: kept=True representative=NH2 reason=selected
+- NH3: kept=True representative=NH3 reason=protected,selected
+- NO: kept=True representative=NO reason=selected
+- HNO: kept=True representative=HNO reason=selected
+- F: kept=True representative=F reason=selected
+- F2: kept=True representative=F2 reason=selected
+- HF: kept=True representative=HF reason=selected
+- Si: kept=True representative=Si reason=selected
+- SiF: kept=False representative=SiF reason=removed
+- SiF2: kept=False representative=SiF2 reason=removed
+- SiF3: kept=False representative=SiF3 reason=removed
+- SiF4: kept=True representative=SiF4 reason=protected,selected
+- SiO: kept=False representative=SiO reason=removed
+- SiO2: kept=False representative=SiO2 reason=removed
+- SiFO: kept=False representative=SiFO reason=removed

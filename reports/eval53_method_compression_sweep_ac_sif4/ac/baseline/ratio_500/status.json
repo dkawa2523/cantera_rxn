@@ -1,0 +1,12 @@
+{
+  "benchmark": "ac",
+  "level": "ratio_500",
+  "mechanism_reduced": "reports/eval53_method_compression_sweep_ac_sif4/ac/baseline/ratio_500/mechanism_reduced.yaml",
+  "method": "baseline",
+  "method_label": "baseline_proxy",
+  "reactions_after": 24,
+  "reactions_before": 325,
+  "species_after": 27,
+  "species_before": 53,
+  "status": "success"
+}

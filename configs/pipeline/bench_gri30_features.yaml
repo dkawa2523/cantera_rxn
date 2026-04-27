@@ -11,12 +11,14 @@ steps:
     inputs: { runs: "@sim" }
     params: {}
   - id: f
-    task: features.extract
+    task: features.run
     inputs: { runs: "@sim", graph: "@g" }
     params:
-      feature_sets: [timeseries_summary, rop_summary]
-      rop_top_n: 50
+      features:
+        timeseries_summary: {}
+        rop_wdot_summary:
+          top_n: 50
   - id: viz
-    task: viz.make
+    task: viz.ds_dashboard
     inputs: { runs: "@sim", graph: "@g", features: "@f" }
     params: { dashboard: ds }

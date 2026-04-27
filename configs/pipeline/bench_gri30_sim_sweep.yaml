@@ -8,6 +8,6 @@ steps:
       conditions_file: ${benchmarks.conditions_file}
       model: gri30
   - id: viz
-    task: viz.make
+    task: viz.ds_dashboard
     inputs: { runs: "@sim" }
     params: { dashboard: ds }

@@ -445,14 +445,6 @@ def _build_reaction_map_from_stoich(
     return reaction_map, meta
 
 
-def _fallback_reaction_map(
-    reaction_ids: Sequence[str],
-    species: Sequence[str],
-) -> list[list[tuple[int, float]]]:
-    species_indices = [(idx, 1.0) for idx in range(len(species))]
-    return [list(species_indices) for _ in reaction_ids]
-
-
 def _precompute_reaction_pairs(
     reaction_map: Sequence[Sequence[tuple[int, float]]],
 ) -> list[list[tuple[int, int, float]]]:
@@ -705,7 +697,7 @@ def build_temporal_flux_graph(
             "windowing.type must be one of log_time, event_based, fixed."
         )
 
-    stoich_source = "fallback_full"
+    reaction_map_meta: dict[str, Any] = {}
     solution_for_meta: Optional[Any] = None
     if reaction_map_cfg is not None:
         reaction_map = _build_reaction_map_from_cfg(
@@ -716,16 +708,21 @@ def build_temporal_flux_graph(
         from rxn_platform.tasks import graphs as graph_tasks
 
         if graph_tasks.ct is None:
-            reaction_map = _fallback_reaction_map(base_reactions, base_species)
-        else:
-            solution_for_meta = graph_tasks._load_solution(mechanism, phase)
-            stoich = graph_tasks.build_stoich(solution_for_meta)
-            reaction_map, reaction_map_meta = _build_reaction_map_from_stoich(
-                stoich, base_reactions, base_species
+            raise ConfigError(
+                "Cantera is required to derive temporal flux graph stoichiometry "
+                "from mechanism; provide params.reaction_map when Cantera is unavailable."
             )
-            stoich_source = "mechanism"
+        solution_for_meta = graph_tasks._load_solution(mechanism, phase)
+        stoich = graph_tasks.build_stoich(solution_for_meta)
+        reaction_map, reaction_map_meta = _build_reaction_map_from_stoich(
+            stoich, base_reactions, base_species
+        )
+        stoich_source = "mechanism"
     else:
-        reaction_map = _fallback_reaction_map(base_reactions, base_species)
+        raise ConfigError(
+            "temporal flux graphs require mechanism stoichiometry or an explicit "
+            "params.reaction_map."
+        )
 
     reaction_pairs = _precompute_reaction_pairs(reaction_map)
 
@@ -867,7 +864,7 @@ def build_temporal_flux_graph(
         "rop": dict(rop_cfg),
         "sparsify": dict(sparsify_cfg),
         "stoich_source": stoich_source,
-        "reaction_map": reaction_map_meta if "reaction_map_meta" in locals() else {},
+        "reaction_map": reaction_map_meta,
         "reaction_stats": {
             "activity": {
                 "type": "abs_rop_sum",

@@ -1,0 +1,31 @@
+digraph G {
+  rankdir=LR;
+  label="sif4 learnck_style_proxy ratio_100 network";
+  "F" [shape=ellipse];
+  "N" [shape=ellipse];
+  "N2" [shape=ellipse];
+  "Si" [shape=ellipse];
+  "SiF" [shape=ellipse];
+  "SiF2" [shape=ellipse];
+  "SiF3" [shape=ellipse];
+  "SiF4" [shape=ellipse];
+  "R0" [shape=box];
+  "R1" [shape=box];
+  "R2" [shape=box];
+  "R3" [shape=box];
+  "R4" [shape=box];
+  "F" -> "R0" [label="reactant"];
+  "SiF3" -> "R0" [label="reactant"];
+  "R0" -> "SiF4" [label="product"];
+  "F" -> "R1" [label="reactant"];
+  "SiF2" -> "R1" [label="reactant"];
+  "R1" -> "SiF3" [label="product"];
+  "F" -> "R2" [label="reactant"];
+  "SiF" -> "R2" [label="reactant"];
+  "R2" -> "SiF2" [label="product"];
+  "F" -> "R3" [label="reactant"];
+  "Si" -> "R3" [label="reactant"];
+  "R3" -> "SiF" [label="product"];
+  "N" -> "R4" [label="reactant"];
+  "R4" -> "N2" [label="product"];
+}

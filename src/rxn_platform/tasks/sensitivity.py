@@ -17,7 +17,6 @@ from rxn_platform.core import (
     resolve_repo_path,
 )
 from rxn_platform.errors import ConfigError
-from rxn_platform.io_utils import write_json_atomic
 from rxn_platform.pipelines import PipelineRunner
 from rxn_platform.registry import Registry, register
 from rxn_platform.store import ArtifactCacheResult, ArtifactStore
@@ -27,19 +26,8 @@ from rxn_platform.tasks.common import (
     code_metadata as _code_metadata,
     read_table_rows as _read_table_rows,
     resolve_cfg as _resolve_cfg,
+    write_table_rows,
 )
-
-try:  # Optional dependency.
-    import pandas as pd
-except ImportError:  # pragma: no cover - optional dependency
-    pd = None
-
-try:  # Optional dependency.
-    import pyarrow as pa
-    import pyarrow.parquet as pq
-except ImportError:  # pragma: no cover - optional dependency
-    pa = None
-    pq = None
 
 DEFAULT_EPS = 1.0e-2
 DEFAULT_DEFINITION = "dlogk"
@@ -737,28 +725,12 @@ def _collect_columns(rows: Sequence[Mapping[str, Any]]) -> list[str]:
 
 def _write_sensitivity_table(rows: Sequence[Mapping[str, Any]], path: Path) -> None:
     columns = _collect_columns(rows)
-    if pd is not None:
-        frame = pd.DataFrame(list(rows), columns=columns)
-        try:
-            frame.to_parquet(path, index=False)
-            return
-        except Exception:
-            pass
-    if pa is not None and pq is not None:
-        table = pa.Table.from_pylist(list(rows))
-        table = table.select(columns)
-        pq.write_table(table, path)
-        return
-    payload = {"columns": columns, "rows": list(rows)}
-    write_json_atomic(path, payload)
-    json_path = path.with_suffix(".json")
-    if json_path != path:
-        write_json_atomic(json_path, payload)
-    logger = logging.getLogger("rxn_platform.sensitivity")
-    logger.warning(
-        "Parquet writer unavailable; stored JSON payload at %s and %s.",
+    write_table_rows(
+        rows,
         path,
-        json_path,
+        columns=columns,
+        column_types={"reaction_index": "int", "rank": "int", "value": "float"},
+        logger_name="rxn_platform.sensitivity",
     )
 
 

@@ -1,0 +1,139 @@
+# ac baseline_proxy ratio_900 network
+
+- mechanism: `reports/eval53_method_compression_sweep_ac_sif4/ac/baseline/ratio_900/mechanism_reduced.yaml`
+
+## Drawn Nodes
+- `C2H`
+- `C2H2`
+- `C2H3`
+- `C2H4`
+- `C2H5`
+- `C2H6`
+- `C3H7`
+- `C3H8`
+- `CH`
+- `CH2`
+- `CH2(S)`
+- `CH2CHO`
+- `CH2CO`
+- `CH2O`
+- `CH2OH`
+- `CH3`
+- `CH3CHO`
+- `CH3O`
+- `CH3OH`
+- `CH4`
+- `CN`
+- `CO`
+- `H`
+- `H2`
+- `H2CN`
+- `H2O`
+- `H2O2`
+- `HCCO`
+- `HCN`
+- `HCNN`
+- `HCO`
+- `HNCO`
+- `HO2`
+- `N`
+- `N2`
+- `NCO`
+- `NH`
+- `O2`
+- `R0`
+- `R1`
+- `R3`
+- `R4`
+- `R5`
+- `R6`
+- `R10`
+- `R11`
+- `R13`
+- `R15`
+- `R17`
+- `R19`
+- `R20`
+- `R22`
+- `R25`
+- `R31`
+- `R32`
+- `R33`
+- `R35`
+- `R37`
+- `R44`
+- `R56`
+- `R64`
+- `R70`
+- `R79`
+- `R88`
+- `R95`
+- `R105`
+- `R106`
+- `R107`
+- `R111`
+- `R117`
+- `R125`
+- `R130`
+- `R132`
+- `R133`
+- `R135`
+- `R138`
+- `R142`
+- `R143`
+
+## Selection Map
+
+- H2: kept=True representative=None reason=protected,selected
+- H: kept=True representative=None reason=selected
+- O: kept=False representative=None reason=removed
+- O2: kept=True representative=None reason=protected,selected
+- OH: kept=False representative=None reason=removed
+- H2O: kept=True representative=None reason=protected,selected
+- HO2: kept=True representative=None reason=selected
+- H2O2: kept=True representative=None reason=selected
+- C: kept=True representative=None reason=selected
+- CH: kept=True representative=None reason=selected
+- CH2: kept=True representative=None reason=selected
+- CH2(S): kept=True representative=None reason=selected
+- CH3: kept=True representative=None reason=selected
+- CH4: kept=True representative=None reason=protected,selected
+- CO: kept=True representative=None reason=protected,selected
+- CO2: kept=True representative=None reason=protected,selected
+- HCO: kept=True representative=None reason=selected
+- CH2O: kept=True representative=None reason=selected
+- CH2OH: kept=True representative=None reason=selected
+- CH3O: kept=True representative=None reason=selected
+- CH3OH: kept=True representative=None reason=selected
+- C2H: kept=True representative=None reason=selected
+- C2H2: kept=True representative=None reason=protected,selected
+- C2H3: kept=True representative=None reason=selected
+- C2H4: kept=True representative=None reason=protected,selected
+- C2H5: kept=True representative=None reason=selected
+- C2H6: kept=True representative=None reason=selected
+- HCCO: kept=True representative=None reason=selected
+- CH2CO: kept=True representative=None reason=selected
+- HCCOH: kept=True representative=None reason=selected
+- N: kept=True representative=None reason=selected
+- NH: kept=True representative=None reason=selected
+- NH2: kept=True representative=None reason=selected
+- NH3: kept=True representative=None reason=protected,selected
+- NNH: kept=False representative=None reason=removed
+- NO: kept=False representative=None reason=removed
+- NO2: kept=False representative=None reason=removed
+- N2O: kept=True representative=None reason=selected
+- HNO: kept=True representative=None reason=selected
+- CN: kept=True representative=None reason=selected
+- HCN: kept=True representative=None reason=selected
+- H2CN: kept=True representative=None reason=selected
+- HCNN: kept=True representative=None reason=selected
+- HCNO: kept=True representative=None reason=selected
+- HOCN: kept=True representative=None reason=selected
+- HNCO: kept=True representative=None reason=selected
+- NCO: kept=True representative=None reason=selected
+- N2: kept=True representative=None reason=protected,selected
+- AR: kept=True representative=None reason=selected
+- C3H7: kept=True representative=None reason=selected
+- C3H8: kept=True representative=None reason=selected
+- CH2CHO: kept=True representative=None reason=selected
+- CH3CHO: kept=True representative=None reason=selected

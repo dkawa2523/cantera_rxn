@@ -1,0 +1,112 @@
+generator: YamlWriter
+cantera-version: 3.1.0
+git-commit: '6e00275'
+date: Mon Apr 27 11:10:05 2026
+phases:
+  - name: gas_pooling_proxy_ratio_400
+    thermo: ideal-gas
+    elements: [H, O, N, F, Si]
+    species: [H, H2, O2, H2O, H2O2, N2, NH3, F, F2, HF, SiF4]
+    kinetics: bulk
+    state:
+      T: 1.0e-03
+      density: 1.0e-03
+      Y: {H: 1.0}
+species:
+  - name: H
+    composition: {H: 1.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: H2
+    composition: {H: 2.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: O2
+    composition: {O: 2.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: H2O
+    composition: {H: 2.0, O: 1.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: H2O2
+    composition: {H: 2.0, O: 2.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: N2
+    composition: {N: 2.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: NH3
+    composition: {H: 3.0, N: 1.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: F
+    composition: {F: 1.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: F2
+    composition: {F: 2.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: HF
+    composition: {F: 1.0, H: 1.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: SiF4
+    composition: {F: 4.0, Si: 1.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+reactions:
+  - equation: F + H2 <=> H + HF
+    rate-constant: {A: 3.3e+04, b: 0.0, Ea: 1.6e+04}
+  - equation: F2 + H <=> F + HF
+    rate-constant: {A: 3.35e+04, b: 0.0, Ea: 1.625e+04}
+  - equation: 2 H <=> H2
+    rate-constant: {A: 4.3e+04, b: 0.0, Ea: 2.1e+04}
+  - equation: 2 F <=> F2
+    rate-constant: {A: 4.4e+04, b: 0.0, Ea: 2.15e+04}

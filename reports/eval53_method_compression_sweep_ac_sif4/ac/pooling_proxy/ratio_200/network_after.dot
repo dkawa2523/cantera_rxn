@@ -1,0 +1,4 @@
+digraph G {
+  rankdir=LR;
+  label="ac pooling_proxy ratio_200 network";
+}

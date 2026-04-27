@@ -11,17 +11,18 @@ steps:
     inputs: { runs: "@sim_full" }
     params: {}
   - id: f
-    task: features.extract
+    task: features.run
     inputs: { runs: "@sim_full", graph: "@g" }
     params:
-      feature_sets: [rop_summary]
-      rop_top_n: 100
+      features:
+        rop_wdot_summary:
+          top_n: 100
   - id: red
-    task: reduction.prune_by_importance
+    task: reduction.threshold_prune
     inputs: { graph: "@g", features: "@f" }
     params:
-      method: rop_threshold
-      threshold: 1.0e-4
+      threshold:
+        score_lt: 1.0e-4
   - id: sim_red
     task: sim.sweep_csv
     inputs: {}
@@ -36,13 +37,13 @@ steps:
     params:
       metrics:
         - name: CO2_final_rmse
-          target: "gas_composition:CO2_final"
+          target: "gas.CO2.last"
         - name: CO_final_rmse
-          target: "gas_composition:CO_final"
+          target: "gas.CO.last"
       tolerances:
         CO2_final_rmse: 0.03
         CO_final_rmse: 0.03
   - id: viz
-    task: viz.make
+    task: viz.ds_dashboard
     inputs: { validation: "@val", graph: "@g" }
     params: { dashboard: ds }

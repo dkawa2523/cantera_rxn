@@ -1,0 +1,2 @@
+case_id,T,P,t_end,gas_X,surface_phase,surface_coverages,area,volume
+surface0,1200.0,2666.0,1e-6,"H:0.01,H2:0.89,CH3:0.10",diamond_100,"c6HH:0.9,c6H*:0.1",1.0,1.0

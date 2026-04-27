@@ -1,0 +1,68 @@
+kind,species,kept,representative,score,reason,reaction_index,equation
+species,H,True,H,0.0,selected,,
+species,H2,True,H2,3.942487052580414e-15,"protected,selected",,
+species,O,True,O,0.0,selected,,
+species,O2,True,O2,0.019999999999999997,"protected,selected",,
+species,OH,True,OH,0.0,selected,,
+species,HO2,True,HO2,0.0,selected,,
+species,H2O,True,H2O,2.3828665354980398e-20,"protected,selected",,
+species,H2O2,True,H2O2,0.0,selected,,
+species,N,True,N,0.0,selected,,
+species,N2,True,N2,0.7399999999999999,"protected,selected",,
+species,NH,True,NH,0.0,selected,,
+species,NH2,True,NH2,0.0,selected,,
+species,NH3,True,NH3,0.15999999999999998,"protected,selected",,
+species,NO,True,NO,0.0,selected,,
+species,HNO,True,HNO,0.0,selected,,
+species,F,True,F,0.0,selected,,
+species,F2,True,F2,0.0,selected,,
+species,HF,True,HF,0.0,selected,,
+species,Si,True,Si,0.0,selected,,
+species,SiF,True,SiF,0.0,selected,,
+species,SiF2,True,SiF2,0.0,selected,,
+species,SiF3,True,SiF3,0.0,selected,,
+species,SiF4,True,SiF4,0.08,"protected,selected",,
+species,SiO,True,SiO,0.0,selected,,
+species,SiO2,True,SiO2,0.0,selected,,
+species,SiFO,True,SiFO,0.0,selected,,
+reaction,,True,,,,0,H + SiF4 <=> HF + SiF3
+reaction,,True,,,,1,H + SiF3 <=> HF + SiF2
+reaction,,True,,,,2,H + SiF2 <=> HF + SiF
+reaction,,True,,,,3,H + SiF <=> HF + Si
+reaction,,True,,,,4,H + NH3 <=> H2 + NH2
+reaction,,True,,,,5,H + NH2 <=> H2 + NH
+reaction,,True,,,,6,H + NH <=> H2 + N
+reaction,,True,,,,7,H + O2 <=> O + OH
+reaction,,True,,,,8,H2 + OH <=> H + H2O
+reaction,,True,,,,9,H2 + O <=> H + OH
+reaction,,True,,,,10,NH2 + O <=> H + HNO
+reaction,,True,,,,11,H + HNO <=> H2 + NO
+reaction,,True,,,,12,N + NO <=> N2 + O
+reaction,,True,,,,13,O2 + Si <=> O + SiO
+reaction,,True,,,,14,O + SiO <=> SiO2
+reaction,,True,,,,15,O + SiF2 <=> F + SiFO
+reaction,,True,,,,16,F + H2 <=> H + HF
+reaction,,True,,,,17,F2 + H <=> F + HF
+reaction,,True,,,,18,F + SiF3 <=> SiF4
+reaction,,True,,,,19,F + SiF2 <=> SiF3
+reaction,,True,,,,20,F + SiF <=> SiF2
+reaction,,True,,,,21,F + Si <=> SiF
+reaction,,True,,,,22,NH + O <=> H + NO
+reaction,,True,,,,23,N + O2 <=> NO + O
+reaction,,True,,,,24,H + HO2 <=> 2 OH
+reaction,,True,,,,25,H + O2 <=> HO2
+reaction,,True,,,,26,H + H2O2 <=> H2O + OH
+reaction,,True,,,,27,2 OH <=> H2O2
+reaction,,True,,,,28,NH3 + SiF4 <=> HF + NH2 + SiF3
+reaction,,True,,,,29,NH2 + SiF3 <=> HF + NH + SiF2
+reaction,,True,,,,30,NH + SiF2 <=> HF + N + SiF
+reaction,,True,,,,31,O + SiF <=> F + SiO
+reaction,,True,,,,32,H + SiFO <=> HF + SiO
+reaction,,True,,,,33,NH3 + OH <=> H2O + NH2
+reaction,,True,,,,34,NH2 + OH <=> H2O + NH
+reaction,,True,,,,35,2 N <=> N2
+reaction,,True,,,,36,2 H <=> H2
+reaction,,True,,,,37,2 O <=> O2
+reaction,,True,,,,38,2 F <=> F2
+reaction,,True,,,,39,OH + SiO <=> H + SiO2
+reaction,,True,,,,40,OH + SiF2 <=> HF + SiFO

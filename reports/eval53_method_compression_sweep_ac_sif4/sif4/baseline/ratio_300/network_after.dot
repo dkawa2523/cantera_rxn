@@ -1,0 +1,9 @@
+digraph G {
+  rankdir=LR;
+  label="sif4 baseline_proxy ratio_300 network";
+  "F" [shape=ellipse];
+  "F2" [shape=ellipse];
+  "R0" [shape=box];
+  "F" -> "R0" [label="reactant"];
+  "R0" -> "F2" [label="product"];
+}

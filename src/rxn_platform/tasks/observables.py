@@ -5,14 +5,12 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 import json
-import logging
 import math
 from pathlib import Path
 import re
 from typing import Any, Optional
 from rxn_platform.core import make_artifact_id
 from rxn_platform.errors import ArtifactError, ConfigError
-from rxn_platform.io_utils import write_json_atomic
 from rxn_platform.registry import Registry, register
 from rxn_platform.run_store import resolve_run_dataset_dir
 from rxn_platform.store import ArtifactCacheResult, ArtifactStore
@@ -22,19 +20,13 @@ from rxn_platform.tasks.common import (
     load_run_dataset_payload,
     load_run_ids_from_run_set,
     resolve_cfg as _resolve_cfg,
+    write_table_rows,
 )
 
 try:  # Optional dependency.
     import pandas as pd
 except ImportError:  # pragma: no cover - optional dependency
     pd = None
-
-try:  # Optional dependency.
-    import pyarrow as pa
-    import pyarrow.parquet as pq
-except ImportError:  # pragma: no cover - optional dependency
-    pa = None
-    pq = None
 
 try:  # Optional dependency.
     import xarray as xr
@@ -1488,39 +1480,12 @@ def _normalize_output(
 
 
 def _write_values_table(rows: Sequence[Mapping[str, Any]], path: Path) -> None:
-    if pd is not None:
-        frame = pd.DataFrame(list(rows), columns=REQUIRED_COLUMNS)
-        try:
-            frame.to_parquet(path, index=False)
-            return
-        except Exception:
-            pass
-    if pa is not None and pq is not None:
-        schema = pa.schema(
-            [
-                ("run_id", pa.string()),
-                ("observable", pa.string()),
-                ("value", pa.float64()),
-                ("unit", pa.string()),
-                ("meta_json", pa.string()),
-            ]
-        )
-        table = pa.Table.from_pylist(list(rows), schema=schema)
-        pq.write_table(table, path)
-        return
-    payload = {
-        "columns": list(REQUIRED_COLUMNS),
-        "rows": list(rows),
-    }
-    write_json_atomic(path, payload)
-    json_path = path.with_suffix(".json")
-    if json_path != path:
-        write_json_atomic(json_path, payload)
-    logger = logging.getLogger("rxn_platform.observables")
-    logger.warning(
-        "Parquet writer unavailable; stored JSON payload at %s and %s.",
+    write_table_rows(
+        rows,
         path,
-        json_path,
+        columns=REQUIRED_COLUMNS,
+        column_types={"value": "float"},
+        logger_name="rxn_platform.observables",
     )
 
 
@@ -1547,33 +1512,10 @@ def run(
         params.get("missing_strategy", obs_cfg.get("missing_strategy"))
     )
 
-    rows: list[dict[str, Any]] = []
-    for run_id in run_ids:
-        store.read_manifest("runs", run_id)
-        run_dir = store.artifact_dir("runs", run_id)
-        run_dataset = _load_run_dataset_view(run_dir)
-        for spec in specs:
-            obs = _resolve_observable(spec.name, registry=registry)
-            requires, requires_coords, requires_attrs = _observable_requirements(obs)
-            missing = _missing_inputs(
-                run_dataset,
-                requires=requires,
-                requires_coords=requires_coords,
-                requires_attrs=requires_attrs,
-            )
-            if missing:
-                status = "skipped" if missing_strategy == "skip" else "missing_input"
-                meta = {"status": status, "missing": missing}
-                rows.append(
-                    _build_row(run_id, spec.name, math.nan, "", meta)
-                )
-                continue
-            output = _call_observable(obs, run_dataset, spec.params)
-            rows.extend(_normalize_output(run_id, spec.name, output))
-
     inputs_payload = {
         "runs": run_ids,
         "observables": [spec.name for spec in specs],
+        "missing_strategy": missing_strategy,
     }
     artifact_id = make_artifact_id(
         inputs=inputs_payload,
@@ -1590,6 +1532,28 @@ def run(
     )
 
     def _writer(base_dir: Path) -> None:
+        rows: list[dict[str, Any]] = []
+        for run_id in run_ids:
+            store.read_manifest("runs", run_id)
+            run_dir = store.artifact_dir("runs", run_id)
+            run_dataset = _load_run_dataset_view(run_dir)
+            for spec in specs:
+                obs = _resolve_observable(spec.name, registry=registry)
+                requires, requires_coords, requires_attrs = _observable_requirements(obs)
+                missing = _missing_inputs(
+                    run_dataset,
+                    requires=requires,
+                    requires_coords=requires_coords,
+                    requires_attrs=requires_attrs,
+                )
+                if missing:
+                    if missing_strategy == "skip":
+                        continue
+                    meta = {"status": "missing_input", "missing": missing}
+                    rows.append(_build_row(run_id, spec.name, math.nan, "", meta))
+                    continue
+                output = _call_observable(obs, run_dataset, spec.params)
+                rows.extend(_normalize_output(run_id, spec.name, output))
         _write_values_table(rows, base_dir / "values.parquet")
 
     return store.ensure(manifest, writer=_writer)

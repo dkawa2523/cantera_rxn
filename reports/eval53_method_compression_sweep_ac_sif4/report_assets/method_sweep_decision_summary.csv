@@ -1,0 +1,7 @@
+benchmark,case_id,method,success_count,failed_count,best_ratio_within_1pct,reaction_reduction_within_1pct,best_ratio_within_5pct,reaction_reduction_within_5pct,max_success_ratio,max_success_reaction_reduction,max_success_T_final_rel_pct,max_success_density_final_rel_pct
+ac,dilute_N2,baseline,7,3,ratio_1000,0.0,ratio_1000,0.0,ratio_300,99.6923076923077,-30.002171891639655,44.15028017123129
+ac,dilute_N2,learnCK,10,0,ratio_100,89.84615384615384,ratio_100,89.84615384615384,ratio_050,94.76923076923077,-30.0021722951527,44.1502808446704
+ac,dilute_N2,pooling,10,0,ratio_1000,0.0,ratio_1000,0.0,ratio_200,100.0,-30.0021722951527,44.1502808446704
+sif4,add_O2,baseline,7,3,ratio_900,12.195121951219512,ratio_900,12.195121951219512,ratio_300,97.5609756097561,74.47957122241074,18.616941441574696
+sif4,add_O2,learnCK,10,0,ratio_100,87.8048780487805,ratio_100,87.8048780487805,ratio_050,92.6829268292683,6.253199298035894,2.5667047301771757
+sif4,add_O2,pooling,10,0,ratio_900,12.195121951219512,ratio_900,12.195121951219512,ratio_200,100.0,74.47957122241074,18.616941441574696

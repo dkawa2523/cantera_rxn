@@ -288,6 +288,7 @@ class CanteraBackend(SimulationBackend):
                 if phase != "gas":
                     raise
                 gas = ct.Solution(mechanism)
+        actual_phase = str(getattr(gas, "name", "") or phase or "")
 
         initial_cfg = _require_mapping(cfg.get("initial"), "initial")
         temperature = _as_float(initial_cfg.get("T"), "initial.T")
@@ -373,33 +374,34 @@ class CanteraBackend(SimulationBackend):
         for target_time in time_grid:
             if target_time > sim.time:
                 sim.advance(float(target_time))
+            thermo = reactor.thermo
             times.append(float(sim.time))
-            temperatures.append(float(reactor.T))
-            pressures.append(float(reactor.thermo.P))
-            mole_fractions.append([float(x) for x in reactor.thermo.X])
+            temperatures.append(float(thermo.T))
+            pressures.append(float(thermo.P))
+            mole_fractions.append([float(x) for x in thermo.X])
             if wdot_ok:
                 try:
-                    wdot.append([float(x) for x in gas.net_production_rates])
+                    wdot.append([float(x) for x in thermo.net_production_rates])
                 except Exception:
                     wdot_ok = False
             if rop_net_ok:
                 try:
                     rop_net.append(
-                        [float(x) for x in gas.net_rates_of_progress]
+                        [float(x) for x in thermo.net_rates_of_progress]
                     )
                 except Exception:
                     rop_net_ok = False
             if creation_ok:
                 try:
                     creation_rates.append(
-                        [float(x) for x in gas.creation_rates]
+                        [float(x) for x in thermo.creation_rates]
                     )
                 except Exception:
                     creation_ok = False
             if destruction_ok:
                 try:
                     destruction_rates.append(
-                        [float(x) for x in gas.destruction_rates]
+                        [float(x) for x in thermo.destruction_rates]
                     )
                 except Exception:
                     destruction_ok = False
@@ -427,8 +429,10 @@ class CanteraBackend(SimulationBackend):
         }
         if applied_multipliers:
             attrs["reaction_multipliers"] = applied_multipliers
-        if phase is not None:
-            attrs["phase"] = phase
+        if actual_phase:
+            attrs["phase"] = actual_phase
+        if phase is not None and phase != actual_phase:
+            attrs["requested_phase"] = phase
 
         coords = {
             "time": {"dims": ["time"], "data": times},

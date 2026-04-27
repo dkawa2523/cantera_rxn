@@ -1,0 +1,75 @@
+# ac learnck_style_proxy ratio_400 network
+
+- mechanism: `reports/eval53_method_compression_sweep_ac_sif4/ac/learnck/ratio_400/mechanism_reduced.yaml`
+
+## Drawn Nodes
+- `C2H`
+- `C2H2`
+- `C2H3`
+- `C2H4`
+- `C2H6`
+- `CH`
+- `CH2`
+- `CH2(S)`
+- `CH2CHO`
+- `CH2CO`
+- `CH2O`
+- `CH3`
+- `CH3O`
+- `CH3OH`
+- `CH4`
+- `CO`
+- `CO2`
+- `H`
+- `H2`
+- `H2O`
+- `H2O2`
+- `HCCO`
+- `HCO`
+- `HO2`
+- `O`
+- `O2`
+- `OH`
+- `R0`
+- `R1`
+- `R2`
+- `R3`
+- `R4`
+- `R5`
+- `R6`
+- `R7`
+- `R8`
+- `R9`
+- `R10`
+- `R11`
+- `R12`
+- `R13`
+- `R14`
+- `R15`
+- `R16`
+- `R17`
+- `R18`
+- `R19`
+- `R20`
+- `R21`
+- `R22`
+- `R23`
+- `R24`
+- `R25`
+- `R27`
+- `R28`
+- `R33`
+- `R36`
+- `R45`
+- `R54`
+- `R62`
+- `R91`
+- `R97`
+- `R104`
+- `R108`
+- `R116`
+- `R125`
+- `R126`
+
+## Selection Map
+

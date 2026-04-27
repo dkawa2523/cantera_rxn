@@ -6,7 +6,6 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from itertools import combinations
 import json
-import logging
 import math
 from pathlib import Path
 from typing import Any, Optional
@@ -22,7 +21,9 @@ from rxn_platform.tasks.common import (
     code_metadata as _code_metadata,
     load_run_dataset_payload,
     load_run_ids_from_run_set,
+    read_table_rows,
     resolve_cfg as _resolve_cfg,
+    write_table_rows,
 )
 
 try:  # Optional dependency.
@@ -34,13 +35,6 @@ try:  # Optional dependency.
     import numpy as np
 except ImportError:  # pragma: no cover - optional dependency
     np = None
-
-try:  # Optional dependency.
-    import pyarrow as pa
-    import pyarrow.parquet as pq
-except ImportError:  # pragma: no cover - optional dependency
-    pa = None
-    pq = None
 
 try:  # Optional dependency.
     import xarray as xr
@@ -1356,36 +1350,12 @@ def _normalize_output(
 
 
 def _write_features_table(rows: Sequence[Mapping[str, Any]], path: Path) -> None:
-    if pd is not None:
-        frame = pd.DataFrame(list(rows), columns=REQUIRED_COLUMNS)
-        try:
-            frame.to_parquet(path, index=False)
-            return
-        except Exception:
-            pass
-    if pa is not None and pq is not None:
-        schema = pa.schema(
-            [
-                ("run_id", pa.string()),
-                ("feature", pa.string()),
-                ("value", pa.float64()),
-                ("unit", pa.string()),
-                ("meta_json", pa.string()),
-            ]
-        )
-        table = pa.Table.from_pylist(list(rows), schema=schema)
-        pq.write_table(table, path)
-        return
-    payload = {"columns": list(REQUIRED_COLUMNS), "rows": list(rows)}
-    write_json_atomic(path, payload)
-    json_path = path.with_suffix(".json")
-    if json_path != path:
-        write_json_atomic(json_path, payload)
-    logger = logging.getLogger("rxn_platform.features")
-    logger.warning(
-        "Parquet writer unavailable; stored JSON payload at %s and %s.",
+    write_table_rows(
+        rows,
         path,
-        json_path,
+        columns=REQUIRED_COLUMNS,
+        column_types={"value": "float"},
+        logger_name="rxn_platform.features",
     )
 
 
@@ -4621,6 +4591,8 @@ def gnn_importance(
         run_ids = _coerce_str_sequence(inputs_run_ids_raw or source_run_ids_raw, "run_ids")
         if not run_ids:
             raise ConfigError("gnn_importance requires run_ids.")
+    run_ids = list(dict.fromkeys(run_ids))
+    allowed_run_ids = set(run_ids)
 
     windows = _extract_window_entries(dataset_payload)
 
@@ -4705,8 +4677,8 @@ def gnn_importance(
             run_id = item.get("run_id") or item.get("case_id")
             if run_id is None or not isinstance(run_id, str):
                 continue
-            if run_id not in run_ids:
-                run_ids.append(run_id)
+            if run_id not in allowed_run_ids:
+                continue
             window_id = item.get("window_id")
             if window_id is None:
                 continue
@@ -4778,8 +4750,6 @@ def gnn_importance(
                         meta_payload,
                     )
                 )
-
-    run_ids = list(dict.fromkeys(run_ids))
 
     if include_reactions:
         for run_id in run_ids:

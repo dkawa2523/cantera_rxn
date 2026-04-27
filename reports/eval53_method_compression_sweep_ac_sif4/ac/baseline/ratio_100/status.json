@@ -1,0 +1,7 @@
+{
+  "benchmark": "ac",
+  "error": "baseline candidate would remove all reactions",
+  "level": "ratio_100",
+  "method": "baseline",
+  "status": "failed"
+}

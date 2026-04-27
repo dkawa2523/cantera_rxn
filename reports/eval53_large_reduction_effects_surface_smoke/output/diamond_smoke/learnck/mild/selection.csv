@@ -1,0 +1,21 @@
+kind,reaction_index,kept,score,score_source,equation
+reaction,0,True,4.268485239142215e-10,integrated_abs_rop_proxy,H + c6HH <=> H2 + c6H*
+reaction,1,True,7.490356722834352e-12,integrated_abs_rop_proxy,H + c6H* <=> c6HH
+reaction,2,True,3.718885585003448e-11,integrated_abs_rop_proxy,CH3 + c6H* <=> c6HM
+reaction,3,True,5.497439659078359e-13,integrated_abs_rop_proxy,H + c6HM <=> H2 + c6*M
+reaction,4,True,2.6830642561195073e-14,integrated_abs_rop_proxy,H + c6*M <=> c6HM
+reaction,5,True,1.4418071468341237e-13,integrated_abs_rop_proxy,H + c6HM <=> H2 + c6HM*
+reaction,6,False,2.9259810836713845e-16,integrated_abs_rop_proxy,H + c6HM* <=> c6HM
+reaction,7,True,1.2329135253334225e-13,integrated_abs_rop_proxy,c6HM* <=> c6*M
+reaction,8,False,7.469321955204648e-16,integrated_abs_rop_proxy,H + c6HM* <=> CH3 + c6H*
+reaction,9,False,1.783841264913939e-16,integrated_abs_rop_proxy,H + c6HM* <=> H2 + c6B
+reaction,10,False,4.2908096859360695e-15,integrated_abs_rop_proxy,H + c6*M <=> H2 + c6B
+reaction,11,True,4.2687328046684215e-10,integrated_abs_rop_proxy,H + c6HH <=> H2 + c6*H
+reaction,12,True,9.078299777545622e-11,integrated_abs_rop_proxy,H + c6*H <=> c6HH
+reaction,13,True,4.55474902932397e-12,integrated_abs_rop_proxy,H + c6H* <=> H2 + c6**
+reaction,14,True,2.512968726312627e-13,integrated_abs_rop_proxy,H + c6** <=> c6H*
+reaction,15,True,7.218666770983913e-12,integrated_abs_rop_proxy,H + c6*H <=> H2 + c6**
+reaction,16,True,2.51297018292303e-13,integrated_abs_rop_proxy,H + c6** <=> c6*H
+reaction,17,True,1.2568807577157314e-12,integrated_abs_rop_proxy,CH3 + c6** <=> c6*M
+reaction,18,True,1.493533340006499e-09,integrated_abs_rop_proxy,c6H* <=> c6*H
+reaction,19,False,4.4607382360151475e-15,integrated_abs_rop_proxy,c6B => C(d) + c6HH

@@ -1,0 +1,12 @@
+{
+  "benchmark": "diamond_smoke",
+  "level": "mild",
+  "mechanism_reduced": "reports/eval53_large_reduction_effects_surface_smoke/output/diamond_smoke/learnck/mild/mechanism_reduced.yaml",
+  "method": "learnck",
+  "method_label": "learnck_style_proxy",
+  "reactions_after": 15,
+  "reactions_before": 20,
+  "species_after": 13,
+  "species_before": 13,
+  "status": "success"
+}

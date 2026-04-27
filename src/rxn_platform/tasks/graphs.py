@@ -851,14 +851,6 @@ def _build_reaction_map_from_stoich(
     return reaction_map
 
 
-def _fallback_reaction_map(
-    reaction_ids: Sequence[str],
-    species: Sequence[str],
-) -> list[list[tuple[int, float]]]:
-    species_indices = [(idx, 1.0) for idx in range(len(species))]
-    return [list(species_indices) for _ in reaction_ids]
-
-
 def _precompute_reaction_pairs(
     reaction_map: Sequence[Sequence[tuple[int, float]]],
 ) -> list[list[tuple[int, int, float]]]:

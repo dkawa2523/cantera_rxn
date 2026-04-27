@@ -1,0 +1,12 @@
+{
+  "benchmark": "ac",
+  "level": "ratio_750",
+  "mechanism_reduced": "reports/eval53_method_compression_sweep_ac_sif4/ac/learnck/ratio_750/mechanism_reduced.yaml",
+  "method": "learnck",
+  "method_label": "learnck_style_proxy",
+  "reactions_after": 244,
+  "reactions_before": 325,
+  "species_after": 53,
+  "species_before": 53,
+  "status": "success"
+}

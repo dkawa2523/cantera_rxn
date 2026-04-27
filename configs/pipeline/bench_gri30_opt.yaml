@@ -10,22 +10,29 @@ steps:
     task: observables.compute
     inputs: { runs: "@sim_base" }
     params:
-      observables: [gas_composition, temperature_summary]
+      observables:
+        gas_composition:
+          stats: [last]
+          species: [CO2, CO]
   - id: opt
-    task: optimization.random_pareto
+    task: optimization.random_search
     inputs: { runs: "@sim_base", observables: "@obs" }
     params:
       # multi-objective example: maximize CO2_final, minimize CO_final
+      observables:
+        gas_composition:
+          stats: [last]
+          species: [CO2, CO]
       objectives:
         - name: maximize_CO2
-          target: "gas_composition:CO2_final"
+          target: "gas.CO2.last"
           direction: max
         - name: minimize_CO
-          target: "gas_composition:CO_final"
+          target: "gas.CO.last"
           direction: min
-      budget: 80
+      samples: 80
       seed: 0
   - id: viz
-    task: viz.make
+    task: viz.ds_dashboard
     inputs: { optimization: "@opt" }
     params: { dashboard: ds }

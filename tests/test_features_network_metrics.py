@@ -9,6 +9,7 @@ import rxn_platform.tasks.features  # noqa: F401
 import rxn_platform.tasks.sim  # noqa: F401
 
 from rxn_platform.core import ArtifactManifest
+from rxn_platform.io_utils import write_json_atomic
 from rxn_platform.registry import get
 from rxn_platform.store import ArtifactStore
 
@@ -76,6 +77,61 @@ def _write_demo_graph(store: ArtifactStore, graph_id: str) -> None:
         (base_dir / "graph.json").write_text(
             json.dumps(payload, ensure_ascii=True, sort_keys=True) + "\n",
             encoding="utf-8",
+        )
+
+    store.ensure(manifest, writer=_writer)
+
+
+def _write_gnn_dataset_with_extra_run(store: ArtifactStore, dataset_id: str) -> None:
+    manifest = ArtifactManifest(
+        schema_version=1,
+        kind="gnn_datasets",
+        id=dataset_id,
+        created_at="2026-01-18T00:00:00Z",
+        parents=[],
+        inputs={"source": "test"},
+        config={"source": "test"},
+        code={"version": "0.0.0"},
+        provenance={"python": "3.11"},
+    )
+
+    def _writer(base_dir):
+        write_json_atomic(
+            base_dir / "dataset.json",
+            {
+                "source": {"run_ids": ["known-run", "extra-run"], "graph_id": "g"},
+                "windows": [
+                    {"index": 0, "window": {"start_idx": 0, "end_idx": 1}},
+                ],
+                "nodes": {
+                    "order": ["species_A"],
+                    "meta": [
+                        {"id": "species_A", "species": "A", "species_index": 0},
+                    ],
+                },
+                "files": {"data_json": "data.json"},
+            },
+        )
+        write_json_atomic(
+            base_dir / "data.json",
+            {
+                "items": [
+                    {
+                        "run_id": "known-run",
+                        "window_id": 0,
+                        "x": [[2.0]],
+                        "edge_index": [[], []],
+                        "edge_attr": [],
+                    },
+                    {
+                        "run_id": "extra-run",
+                        "window_id": 0,
+                        "x": [[9.0]],
+                        "edge_index": [[], []],
+                        "edge_attr": [],
+                    },
+                ]
+            },
         )
 
     store.ensure(manifest, writer=_writer)
@@ -174,3 +230,32 @@ def test_network_metrics_rank_stability_meta(tmp_path) -> None:
     assert math.isclose(
         stability.get("top_k_jaccard_mean"), 1.0, rel_tol=0.0, abs_tol=1.0e-9
     )
+
+
+def test_gnn_importance_respects_explicit_run_filter(tmp_path) -> None:
+    store = ArtifactStore(tmp_path / "artifacts")
+    dataset_id = "gnn-filter-demo"
+    _write_gnn_dataset_with_extra_run(store, dataset_id)
+
+    task = get("task", "features.gnn_importance")
+    result = task(
+        {
+            "inputs": {
+                "dataset_id": dataset_id,
+                "graph_id": "g",
+                "run_ids": ["known-run"],
+            },
+            "params": {
+                "output": {
+                    "include_species": True,
+                    "include_reactions": False,
+                }
+            },
+        },
+        store=store,
+    )
+
+    rows = _read_features(result.path / "features.parquet")
+    assert result.manifest.inputs["runs"] == ["known-run"]
+    assert {row["run_id"] for row in rows} == {"known-run"}
+    assert all(row["feature"] == "gnn_species_importance" for row in rows)

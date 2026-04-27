@@ -1,0 +1,4 @@
+digraph G {
+  rankdir=LR;
+  label="sif4 pooling_proxy ratio_100 network";
+}

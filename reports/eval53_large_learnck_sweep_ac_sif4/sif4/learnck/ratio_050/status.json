@@ -1,0 +1,12 @@
+{
+  "benchmark": "sif4",
+  "level": "ratio_050",
+  "mechanism_reduced": "reports/eval53_large_learnck_sweep_ac_sif4/sif4/learnck/ratio_050/mechanism_reduced.yaml",
+  "method": "learnck",
+  "method_label": "learnck_style_proxy",
+  "reactions_after": 3,
+  "reactions_before": 41,
+  "species_after": 26,
+  "species_before": 26,
+  "status": "success"
+}

@@ -10,15 +10,22 @@ steps:
     task: observables.compute
     inputs: { runs: "@sim" }
     params:
-      observables: [gas_composition, temperature_summary]
+      observables:
+        gas_composition:
+          stats: [last]
+          species: [CO2, CO]
   - id: sens
-    task: sensitivity.multiplier_scan
+    task: sensitivity.multiplier_fd
     inputs: { runs: "@sim", observables: "@obs" }
     params:
-      targets: ["gas_composition:CO2_final", "gas_composition:CO_final", "temperature_summary:T_final"]
-      delta: 0.05
+      observables:
+        gas_composition:
+          stats: [last]
+          species: [CO2, CO]
+      targets: ["gas.CO2.last", "gas.CO.last"]
+      eps: 0.05
       top_k: 60
   - id: viz
-    task: viz.make
+    task: viz.ds_dashboard
     inputs: { runs: "@sim", observables: "@obs", sensitivity: "@sens" }
     params: { dashboard: ds }

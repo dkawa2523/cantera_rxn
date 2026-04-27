@@ -1,0 +1,243 @@
+generator: YamlWriter
+cantera-version: 3.1.0
+git-commit: '6e00275'
+date: Mon Apr 27 11:09:50 2026
+phases:
+  - name: gas_learnck_ratio_200
+    thermo: ideal-gas
+    elements: [H, O, N, F, Si]
+    species: [H, H2, O, O2, OH, HO2, H2O, H2O2, N, N2, NH, NH2, NH3, NO, HNO, F, F2,
+    HF, Si, SiF, SiF2, SiF3, SiF4, SiO, SiO2, SiFO]
+    kinetics: bulk
+    state:
+      T: 1.0e-03
+      density: 1.0e-03
+      Y: {H: 1.0}
+species:
+  - name: H
+    composition: {H: 1.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: H2
+    composition: {H: 2.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: O
+    composition: {O: 1.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: O2
+    composition: {O: 2.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: OH
+    composition: {H: 1.0, O: 1.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: HO2
+    composition: {H: 1.0, O: 2.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: H2O
+    composition: {H: 2.0, O: 1.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: H2O2
+    composition: {H: 2.0, O: 2.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: N
+    composition: {N: 1.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: N2
+    composition: {N: 2.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: NH
+    composition: {H: 1.0, N: 1.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: NH2
+    composition: {H: 2.0, N: 1.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: NH3
+    composition: {H: 3.0, N: 1.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: NO
+    composition: {N: 1.0, O: 1.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: HNO
+    composition: {H: 1.0, N: 1.0, O: 1.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: F
+    composition: {F: 1.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: F2
+    composition: {F: 2.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: HF
+    composition: {F: 1.0, H: 1.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: Si
+    composition: {Si: 1.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: SiF
+    composition: {F: 1.0, Si: 1.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: SiF2
+    composition: {F: 2.0, Si: 1.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: SiF3
+    composition: {F: 3.0, Si: 1.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: SiF4
+    composition: {F: 4.0, Si: 1.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: SiO
+    composition: {O: 1.0, Si: 1.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: SiO2
+    composition: {O: 2.0, Si: 1.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: SiFO
+    composition: {F: 1.0, O: 1.0, Si: 1.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+reactions:
+  - equation: F + SiF3 <=> SiF4
+    rate-constant: {A: 3.4e+04, b: 0.0, Ea: 1.65e+04}
+  - equation: F + SiF2 <=> SiF3
+    rate-constant: {A: 3.45e+04, b: 0.0, Ea: 1.675e+04}
+  - equation: F + SiF <=> SiF2
+    rate-constant: {A: 3.5e+04, b: 0.0, Ea: 1.7e+04}
+  - equation: F + Si <=> SiF
+    rate-constant: {A: 3.55e+04, b: 0.0, Ea: 1.725e+04}
+  - equation: N + O2 <=> NO + O
+    rate-constant: {A: 3.65e+04, b: 0.0, Ea: 1.775e+04}
+  - equation: NH3 + SiF4 <=> HF + NH2 + SiF3
+    rate-constant: {A: 3.9e+04, b: 0.0, Ea: 1.9e+04}
+  - equation: 2 N <=> N2
+    rate-constant: {A: 4.25e+04, b: 0.0, Ea: 2.075e+04}
+  - equation: 2 O <=> O2
+    rate-constant: {A: 4.35e+04, b: 0.0, Ea: 2.125e+04}
+  - equation: 2 F <=> F2
+    rate-constant: {A: 4.4e+04, b: 0.0, Ea: 2.15e+04}

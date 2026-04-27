@@ -1,0 +1,25 @@
+kind,species,kept,representative,score,reason,reaction_index,equation
+species,H,True,H,0.0,"protected,selected",,
+species,H2,True,H2,0.0,"protected,selected",,
+species,CH3,True,CH3,0.0,"protected,selected",,
+species,CH4,True,CH4,0.0,"protected,selected",,
+reaction,,True,,,,0,H + c6HH <=> H2 + c6H*
+reaction,,True,,,,1,H + c6H* <=> c6HH
+reaction,,True,,,,2,CH3 + c6H* <=> c6HM
+reaction,,True,,,,3,H + c6HM <=> H2 + c6*M
+reaction,,True,,,,4,H + c6*M <=> c6HM
+reaction,,True,,,,5,H + c6HM <=> H2 + c6HM*
+reaction,,True,,,,6,H + c6HM* <=> c6HM
+reaction,,True,,,,7,c6HM* <=> c6*M
+reaction,,True,,,,8,H + c6HM* <=> CH3 + c6H*
+reaction,,True,,,,9,H + c6HM* <=> H2 + c6B
+reaction,,True,,,,10,H + c6*M <=> H2 + c6B
+reaction,,True,,,,11,H + c6HH <=> H2 + c6*H
+reaction,,True,,,,12,H + c6*H <=> c6HH
+reaction,,True,,,,13,H + c6H* <=> H2 + c6**
+reaction,,True,,,,14,H + c6** <=> c6H*
+reaction,,True,,,,15,H + c6*H <=> H2 + c6**
+reaction,,True,,,,16,H + c6** <=> c6*H
+reaction,,True,,,,17,CH3 + c6** <=> c6*M
+reaction,,True,,,,18,c6H* <=> c6*H
+reaction,,True,,,,19,c6B => C(d) + c6HH

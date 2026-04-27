@@ -4,7 +4,7 @@ import rxn_platform.backends.dummy  # Register backend.
 import rxn_platform.tasks.sim  # Register task.
 
 from rxn_platform.backends.dummy import DummyBackend
-from rxn_platform.registry import get, resolve_backend
+from rxn_platform.registry import get, register, resolve_backend
 from rxn_platform.store import ArtifactStore
 
 
@@ -46,3 +46,35 @@ def test_sim_run_task_writes_artifact(tmp_path) -> None:
     assert state_path.exists()
     payload = json.loads(state_path.read_text(encoding="utf-8"))
     assert payload["coords"]["species"]["data"] == ["A", "B", "C"]
+
+
+def test_sim_run_reuses_existing_artifact_before_backend_run(tmp_path) -> None:
+    class CountingDummyBackend(DummyBackend):
+        name = "dummy_cache_counter"
+
+        def __init__(self) -> None:
+            self.calls = 0
+
+        def run(self, cfg):
+            self.calls += 1
+            return super().run(cfg)
+
+    backend = CountingDummyBackend()
+    register("backend", backend.name, backend, overwrite=True)
+    store = ArtifactStore(tmp_path / "artifacts")
+    task = get("task", "sim.run")
+    cfg = {
+        "sim": {
+            "name": backend.name,
+            "time": {"start": 0.0, "stop": 1.0, "steps": 2},
+            "species": ["A", "B"],
+        }
+    }
+
+    first = task(cfg, store=store)
+    second = task(cfg, store=store)
+
+    assert first.reused is False
+    assert second.reused is True
+    assert first.manifest.id == second.manifest.id
+    assert backend.calls == 1

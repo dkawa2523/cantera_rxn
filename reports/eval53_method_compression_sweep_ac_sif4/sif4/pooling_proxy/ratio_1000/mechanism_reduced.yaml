@@ -1,0 +1,307 @@
+generator: YamlWriter
+cantera-version: 3.1.0
+git-commit: '6e00275'
+date: Mon Apr 27 11:09:56 2026
+phases:
+  - name: gas_pooling_proxy_ratio_1000
+    thermo: ideal-gas
+    elements: [H, O, N, F, Si]
+    species: [H, H2, O, O2, OH, HO2, H2O, H2O2, N, N2, NH, NH2, NH3, NO, HNO, F, F2,
+    HF, Si, SiF, SiF2, SiF3, SiF4, SiO, SiO2, SiFO]
+    kinetics: bulk
+    state:
+      T: 1.0e-03
+      density: 1.0e-03
+      Y: {H: 1.0}
+species:
+  - name: H
+    composition: {H: 1.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: H2
+    composition: {H: 2.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: O
+    composition: {O: 1.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: O2
+    composition: {O: 2.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: OH
+    composition: {H: 1.0, O: 1.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: HO2
+    composition: {H: 1.0, O: 2.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: H2O
+    composition: {H: 2.0, O: 1.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: H2O2
+    composition: {H: 2.0, O: 2.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: N
+    composition: {N: 1.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: N2
+    composition: {N: 2.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: NH
+    composition: {H: 1.0, N: 1.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: NH2
+    composition: {H: 2.0, N: 1.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: NH3
+    composition: {H: 3.0, N: 1.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: NO
+    composition: {N: 1.0, O: 1.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: HNO
+    composition: {H: 1.0, N: 1.0, O: 1.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: F
+    composition: {F: 1.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: F2
+    composition: {F: 2.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: HF
+    composition: {F: 1.0, H: 1.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: Si
+    composition: {Si: 1.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: SiF
+    composition: {F: 1.0, Si: 1.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: SiF2
+    composition: {F: 2.0, Si: 1.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: SiF3
+    composition: {F: 3.0, Si: 1.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: SiF4
+    composition: {F: 4.0, Si: 1.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: SiO
+    composition: {O: 1.0, Si: 1.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: SiO2
+    composition: {O: 2.0, Si: 1.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+  - name: SiFO
+    composition: {F: 1.0, O: 1.0, Si: 1.0}
+    thermo:
+      model: constant-cp
+      T0: 298.15
+      h0: 0.0
+      s0: 0.0
+      cp0: 3.3e+04
+reactions:
+  - equation: H + SiF4 <=> HF + SiF3
+    rate-constant: {A: 2.5e+04, b: 0.0, Ea: 1.2e+04}
+  - equation: H + SiF3 <=> HF + SiF2
+    rate-constant: {A: 2.55e+04, b: 0.0, Ea: 1.225e+04}
+  - equation: H + SiF2 <=> HF + SiF
+    rate-constant: {A: 2.6e+04, b: 0.0, Ea: 1.25e+04}
+  - equation: H + SiF <=> HF + Si
+    rate-constant: {A: 2.65e+04, b: 0.0, Ea: 1.275e+04}
+  - equation: H + NH3 <=> H2 + NH2
+    rate-constant: {A: 2.7e+04, b: 0.0, Ea: 1.3e+04}
+  - equation: H + NH2 <=> H2 + NH
+    rate-constant: {A: 2.75e+04, b: 0.0, Ea: 1.325e+04}
+  - equation: H + NH <=> H2 + N
+    rate-constant: {A: 2.8e+04, b: 0.0, Ea: 1.35e+04}
+  - equation: H + O2 <=> O + OH
+    rate-constant: {A: 2.85e+04, b: 0.0, Ea: 1.375e+04}
+  - equation: H2 + OH <=> H + H2O
+    rate-constant: {A: 2.9e+04, b: 0.0, Ea: 1.4e+04}
+  - equation: H2 + O <=> H + OH
+    rate-constant: {A: 2.95e+04, b: 0.0, Ea: 1.425e+04}
+  - equation: NH2 + O <=> H + HNO
+    rate-constant: {A: 3.0e+04, b: 0.0, Ea: 1.45e+04}
+  - equation: H + HNO <=> H2 + NO
+    rate-constant: {A: 3.05e+04, b: 0.0, Ea: 1.475e+04}
+  - equation: N + NO <=> N2 + O
+    rate-constant: {A: 3.1e+04, b: 0.0, Ea: 1.5e+04}
+  - equation: O2 + Si <=> O + SiO
+    rate-constant: {A: 3.15e+04, b: 0.0, Ea: 1.525e+04}
+  - equation: O + SiO <=> SiO2
+    rate-constant: {A: 3.2e+04, b: 0.0, Ea: 1.55e+04}
+  - equation: O + SiF2 <=> F + SiFO
+    rate-constant: {A: 3.25e+04, b: 0.0, Ea: 1.575e+04}
+  - equation: F + H2 <=> H + HF
+    rate-constant: {A: 3.3e+04, b: 0.0, Ea: 1.6e+04}
+  - equation: F2 + H <=> F + HF
+    rate-constant: {A: 3.35e+04, b: 0.0, Ea: 1.625e+04}
+  - equation: F + SiF3 <=> SiF4
+    rate-constant: {A: 3.4e+04, b: 0.0, Ea: 1.65e+04}
+  - equation: F + SiF2 <=> SiF3
+    rate-constant: {A: 3.45e+04, b: 0.0, Ea: 1.675e+04}
+  - equation: F + SiF <=> SiF2
+    rate-constant: {A: 3.5e+04, b: 0.0, Ea: 1.7e+04}
+  - equation: F + Si <=> SiF
+    rate-constant: {A: 3.55e+04, b: 0.0, Ea: 1.725e+04}
+  - equation: NH + O <=> H + NO
+    rate-constant: {A: 3.6e+04, b: 0.0, Ea: 1.75e+04}
+  - equation: N + O2 <=> NO + O
+    rate-constant: {A: 3.65e+04, b: 0.0, Ea: 1.775e+04}
+  - equation: H + HO2 <=> 2 OH
+    rate-constant: {A: 3.7e+04, b: 0.0, Ea: 1.8e+04}
+  - equation: H + O2 <=> HO2
+    rate-constant: {A: 3.75e+04, b: 0.0, Ea: 1.825e+04}
+  - equation: H + H2O2 <=> H2O + OH
+    rate-constant: {A: 3.8e+04, b: 0.0, Ea: 1.85e+04}
+  - equation: 2 OH <=> H2O2
+    rate-constant: {A: 3.85e+04, b: 0.0, Ea: 1.875e+04}
+  - equation: NH3 + SiF4 <=> HF + NH2 + SiF3
+    rate-constant: {A: 3.9e+04, b: 0.0, Ea: 1.9e+04}
+  - equation: NH2 + SiF3 <=> HF + NH + SiF2
+    rate-constant: {A: 3.95e+04, b: 0.0, Ea: 1.925e+04}
+  - equation: NH + SiF2 <=> HF + N + SiF
+    rate-constant: {A: 4.0e+04, b: 0.0, Ea: 1.95e+04}
+  - equation: O + SiF <=> F + SiO
+    rate-constant: {A: 4.05e+04, b: 0.0, Ea: 1.975e+04}
+  - equation: H + SiFO <=> HF + SiO
+    rate-constant: {A: 4.1e+04, b: 0.0, Ea: 2.0e+04}
+  - equation: NH3 + OH <=> H2O + NH2
+    rate-constant: {A: 4.15e+04, b: 0.0, Ea: 2.025e+04}
+  - equation: NH2 + OH <=> H2O + NH
+    rate-constant: {A: 4.2e+04, b: 0.0, Ea: 2.05e+04}
+  - equation: 2 N <=> N2
+    rate-constant: {A: 4.25e+04, b: 0.0, Ea: 2.075e+04}
+  - equation: 2 H <=> H2
+    rate-constant: {A: 4.3e+04, b: 0.0, Ea: 2.1e+04}
+  - equation: 2 O <=> O2
+    rate-constant: {A: 4.35e+04, b: 0.0, Ea: 2.125e+04}
+  - equation: 2 F <=> F2
+    rate-constant: {A: 4.4e+04, b: 0.0, Ea: 2.15e+04}
+  - equation: OH + SiO <=> H + SiO2
+    rate-constant: {A: 4.45e+04, b: 0.0, Ea: 2.175e+04}
+  - equation: OH + SiF2 <=> HF + SiFO
+    rate-constant: {A: 4.5e+04, b: 0.0, Ea: 2.2e+04}

@@ -1,0 +1,77 @@
+# ac learnck_style_proxy ratio_500 network
+
+- mechanism: `reports/eval53_large_learnck_sweep_ac_sif4/ac/learnck/ratio_500/mechanism_reduced.yaml`
+
+## Drawn Nodes
+- `C2H`
+- `C2H2`
+- `C2H3`
+- `C2H6`
+- `CH`
+- `CH2`
+- `CH2(S)`
+- `CH2CHO`
+- `CH2CO`
+- `CH2O`
+- `CH2OH`
+- `CH3`
+- `CH3O`
+- `CH3OH`
+- `CH4`
+- `CO`
+- `CO2`
+- `H`
+- `H2`
+- `H2O`
+- `H2O2`
+- `HCCO`
+- `HCNN`
+- `HCO`
+- `HO2`
+- `N2`
+- `O`
+- `O2`
+- `OH`
+- `R0`
+- `R1`
+- `R2`
+- `R3`
+- `R4`
+- `R5`
+- `R6`
+- `R7`
+- `R8`
+- `R9`
+- `R10`
+- `R11`
+- `R12`
+- `R13`
+- `R14`
+- `R15`
+- `R16`
+- `R17`
+- `R22`
+- `R27`
+- `R30`
+- `R37`
+- `R39`
+- `R42`
+- `R43`
+- `R53`
+- `R54`
+- `R63`
+- `R73`
+- `R107`
+- `R111`
+- `R114`
+- `R117`
+- `R126`
+- `R130`
+- `R147`
+- `R148`
+- `R152`
+- `R159`
+- `R160`
+
+## Selection Map
+
